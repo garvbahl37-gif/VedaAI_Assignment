@@ -2,7 +2,7 @@ services:
   - type: web
     name: vedaai-api
     runtime: node
-    plan: starter
+    plan: free
     rootDir: .
     buildCommand: npm install && npm run build -w @vedaai/shared && npm run build -w @vedaai/api
     startCommand: node apps/api/dist/index.js
@@ -17,7 +17,7 @@ services:
         sync: false
       - key: REDIS_URL
         fromService:
-          type: redis
+          type: keyvalue
           name: vedaai-redis
           property: connectionString
       - key: GEMINI_API_KEY
@@ -27,7 +27,7 @@ services:
       - key: CORS_ORIGIN
         sync: false
 
-  - type: redis
+  - type: keyvalue
     name: vedaai-redis
     plan: free
     maxmemoryPolicy: allkeys-lru
