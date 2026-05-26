@@ -8,7 +8,7 @@ export function MobileHeader() {
   return (
     <header className="lg:hidden sticky top-0 z-20 bg-surface-page px-3 pt-3 pb-2">
       <div className="bg-white rounded-xl shadow-sm border border-line h-14 px-3 flex items-center justify-between">
-        <Logo size={24} />
+        <Logo size={28} variant="black" />
         <div className="flex items-center gap-2">
           <NotificationsButton variant="mobile" />
 

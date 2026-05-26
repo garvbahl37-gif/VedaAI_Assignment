@@ -8,6 +8,7 @@ import { QuestionPaper } from '@/components/paper/QuestionPaper';
 import { GenerationProgress } from '@/components/paper/GenerationProgress';
 import { DownloadPdfButton } from '@/components/paper/DownloadPdfButton';
 import { useGenerationStore } from '@/stores/generationStore';
+import { useProfileStore } from '@/stores/profileStore';
 import { api } from '@/lib/api';
 import { AssignmentWebSocket } from '@/lib/websocket';
 
@@ -39,6 +40,8 @@ export default function AssignmentOutputPage() {
 
   const wsRef = useRef<AssignmentWebSocket | null>(null);
   const [regenerating, setRegenerating] = useState(false);
+  const teacherName = useProfileStore((s) => s.teacherName) || '';
+  const firstName = teacherName.trim().split(/\s+/)[0] || '';
 
   // ─── Initial load: if assignment is already completed, fetch its paper; otherwise connect WS ───
   useEffect(() => {
@@ -153,9 +156,10 @@ export default function AssignmentOutputPage() {
             <p className="text-white text-[15px] font-semibold leading-relaxed">
               {generatedPaper ? (
                 <>
-                  Certainly! Here is your customised question paper for your{' '}
-                  {generatedPaper.className} {generatedPaper.subject} classes,
-                  covering {countQuestions(generatedPaper)} questions across{' '}
+                  Certainly{firstName ? `, ${firstName}` : ''}! Here is your customised
+                  question paper for your {generatedPaper.className}{' '}
+                  {generatedPaper.subject} classes, covering{' '}
+                  {countQuestions(generatedPaper)} questions across{' '}
                   {generatedPaper.sections.length} sections, totalling{' '}
                   {generatedPaper.maximumMarks} marks:
                 </>
