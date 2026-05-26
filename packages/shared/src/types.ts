@@ -101,6 +101,8 @@ export interface CreateAssignmentRequest {
 export interface CreateAssignmentResponse {
   assignment: Assignment;
   jobId: string;
+  /** Present when the API ran the generation inline (serverless mode). */
+  paperId?: string;
 }
 
 export interface ListAssignmentsResponse {

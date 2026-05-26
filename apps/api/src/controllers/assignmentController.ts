@@ -4,8 +4,15 @@ import { Assignment, IAssignment } from '../models/Assignment';
 import { GeneratedPaper } from '../models/GeneratedPaper';
 import { enqueueGeneration } from '../queues/generationQueue';
 import { cacheHelpers } from '../config/redis';
+import { runGenerationPipeline } from '../services/generationPipeline';
 import { HttpError } from '../middleware/errorHandler';
 import type { Assignment as AssignmentDTO, GeneratedPaper as GeneratedPaperDTO } from '@vedaai/shared';
+
+// When running in a serverless environment we can't keep a background Worker
+// alive across requests, so we run the same pipeline INLINE inside the HTTP
+// request that created the assignment. The queue + worker code stays intact
+// for local dev (npm run dev:api).
+const IS_SERVERLESS = !!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
 
 export const createAssignmentSchema = z.object({
   title: z.string().min(1, 'Title is required').max(200),
@@ -45,7 +52,6 @@ function toAssignmentDTO(doc: IAssignment): AssignmentDTO {
 }
 
 function parseDueDate(input: string): Date {
-  // Accept either YYYY-MM-DD or DD-MM-YYYY.
   if (/^\d{4}-\d{2}-\d{2}/.test(input)) return new Date(input);
   const m = input.match(/^(\d{2})-(\d{2})-(\d{4})$/);
   if (m) return new Date(`${m[3]}-${m[2]}-${m[1]}T00:00:00.000Z`);
@@ -85,11 +91,32 @@ export async function createAssignment(req: Request, res: Response, next: NextFu
       status: 'generating',
     });
 
-    const jobId = await enqueueGeneration(doc._id.toString());
-    doc.jobId = jobId;
-    await doc.save();
+    if (IS_SERVERLESS) {
+      // Run the pipeline INLINE — no background Worker on serverless.
+      const jobId = `inline:${doc._id.toString()}:${Date.now()}`;
+      doc.jobId = jobId;
+      await doc.save();
 
-    res.status(201).json({ assignment: toAssignmentDTO(doc), jobId });
+      try {
+        const result = await runGenerationPipeline(doc._id.toString(), jobId);
+        const updated = await Assignment.findById(doc._id).exec();
+        res.status(201).json({
+          assignment: updated ? toAssignmentDTO(updated) : toAssignmentDTO(doc),
+          jobId,
+          paperId: result.paperId,
+        });
+      } catch (err) {
+        doc.status = 'failed';
+        await doc.save();
+        throw err;
+      }
+    } else {
+      // Local dev / Render: enqueue and let the background Worker process it.
+      const jobId = await enqueueGeneration(doc._id.toString());
+      doc.jobId = jobId;
+      await doc.save();
+      res.status(201).json({ assignment: toAssignmentDTO(doc), jobId });
+    }
   } catch (err) {
     next(err);
   }
@@ -148,11 +175,30 @@ export async function regenerateAssignment(req: Request, res: Response, next: Ne
 
     await cacheHelpers.invalidatePaper(doc._id.toString());
     doc.status = 'generating';
-    const jobId = await enqueueGeneration(doc._id.toString());
-    doc.jobId = jobId;
-    await doc.save();
 
-    res.json({ assignment: toAssignmentDTO(doc), jobId });
+    if (IS_SERVERLESS) {
+      const jobId = `inline:${doc._id.toString()}:${Date.now()}`;
+      doc.jobId = jobId;
+      await doc.save();
+      try {
+        const result = await runGenerationPipeline(doc._id.toString(), jobId);
+        const updated = await Assignment.findById(doc._id).exec();
+        res.json({
+          assignment: updated ? toAssignmentDTO(updated) : toAssignmentDTO(doc),
+          jobId,
+          paperId: result.paperId,
+        });
+      } catch (err) {
+        doc.status = 'failed';
+        await doc.save();
+        throw err;
+      }
+    } else {
+      const jobId = await enqueueGeneration(doc._id.toString());
+      doc.jobId = jobId;
+      await doc.save();
+      res.json({ assignment: toAssignmentDTO(doc), jobId });
+    }
   } catch (err) {
     next(err);
   }
