@@ -74,7 +74,12 @@ export function NotificationsPopover({ open, onClose }: NotificationsPopoverProp
   return (
     <div
       ref={popoverRef}
-      className="absolute right-0 top-12 z-30 w-[360px] max-w-[90vw] bg-white border border-line rounded-2xl shadow-2xl overflow-hidden"
+      className="
+        fixed left-4 right-4 top-[4.5rem]
+        sm:absolute sm:left-auto sm:right-0 sm:top-12
+        sm:w-[360px] sm:max-w-[90vw]
+        z-30 bg-white border border-line rounded-2xl shadow-2xl overflow-hidden
+      "
     >
       <div className="flex items-center justify-between px-4 py-3 border-b border-line">
         <h3 className="text-[14px] font-semibold text-ink">Notifications</h3>
