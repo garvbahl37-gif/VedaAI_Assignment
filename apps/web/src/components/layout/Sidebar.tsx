@@ -17,6 +17,7 @@ import { Logo } from '@/components/brand/Logo';
 import { cn } from '@/lib/cn';
 import { useAssignmentStore } from '@/stores/assignmentStore';
 import { useProfileStore } from '@/stores/profileStore';
+import { useLibraryStore } from '@/stores/libraryStore';
 import { ProfileEditDialog } from '@/components/layout/ProfileEditDialog';
 
 interface NavItem {
@@ -29,6 +30,7 @@ interface NavItem {
 export function Sidebar() {
   const pathname = usePathname();
   const assignmentsCount = useAssignmentStore((s) => s.assignments.length);
+  const libraryCount = useLibraryStore((s) => s.quizzes.length);
   const schoolName = useProfileStore((s) => s.schoolName);
   const city = useProfileStore((s) => s.city);
   const [editOpen, setEditOpen] = useState(false);
@@ -43,7 +45,12 @@ export function Sidebar() {
       badge: assignmentsCount > 0 ? assignmentsCount : undefined,
     },
     { label: "AI Teacher's Toolkit", href: '/toolkit', icon: BookOpen },
-    { label: 'My Library', href: '/library', icon: PieChart, badge: 32 },
+    {
+      label: 'My Library',
+      href: '/library',
+      icon: PieChart,
+      badge: libraryCount > 0 ? libraryCount : undefined,
+    },
   ];
 
   return (
