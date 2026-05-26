@@ -12,6 +12,7 @@ import { useCreateAssignmentStore } from '@/stores/createAssignmentStore';
 import { useGenerationStore } from '@/stores/generationStore';
 import { useProfileStore } from '@/stores/profileStore';
 import { useNotificationsStore } from '@/stores/notificationsStore';
+import { extractTextFromFile } from '@/lib/extractText';
 import { api } from '@/lib/api';
 
 export default function CreateAssignmentPage() {
@@ -67,6 +68,7 @@ export default function CreateAssignmentPage() {
         questionTypes: formData.questionTypes,
         additionalInstructions: formData.additionalInstructions.trim() || undefined,
         fileName: formData.fileName || undefined,
+        referenceText: formData.referenceText.trim() || undefined,
         schoolName: schoolName?.trim() || undefined,
         city: city?.trim() || undefined,
       });
@@ -141,9 +143,50 @@ export default function CreateAssignmentPage() {
 
           <FileUploadZone
             file={formData.file}
-            onFile={(file) =>
-              updateFormData({ file, fileName: file?.name ?? '' })
-            }
+            status={formData.referenceStatus}
+            pages={formData.referencePages}
+            truncated={formData.referenceTruncated}
+            charCount={formData.referenceText.length || undefined}
+            onFile={async (file) => {
+              if (!file) {
+                updateFormData({
+                  file: null,
+                  fileName: '',
+                  referenceText: '',
+                  referenceStatus: 'idle',
+                  referencePages: undefined,
+                  referenceTruncated: false,
+                });
+                return;
+              }
+              updateFormData({
+                file,
+                fileName: file.name,
+                referenceText: '',
+                referencePages: undefined,
+                referenceTruncated: false,
+                referenceStatus: 'extracting',
+              });
+              try {
+                const result = await extractTextFromFile(file);
+                if (!result.text) {
+                  updateFormData({ referenceStatus: 'unsupported' });
+                  return;
+                }
+                updateFormData({
+                  referenceText: result.text,
+                  referencePages: result.pages,
+                  referenceTruncated: !!result.truncated,
+                  referenceStatus: 'ready',
+                });
+              } catch (err) {
+                console.error('Reference extraction failed:', err);
+                updateFormData({
+                  referenceText: '',
+                  referenceStatus: 'error',
+                });
+              }
+            }}
           />
 
           <DueDateInput

@@ -28,6 +28,7 @@ export const createAssignmentSchema = z.object({
     .min(1, 'At least one question type is required'),
   additionalInstructions: z.string().optional(),
   fileName: z.string().optional(),
+  referenceText: z.string().max(200_000).optional(),
   schoolName: z.string().max(200).optional(),
   city: z.string().max(120).optional(),
 });
@@ -45,6 +46,7 @@ function toAssignmentDTO(doc: IAssignment): AssignmentDTO {
     additionalInstructions: doc.additionalInstructions,
     fileUrl: doc.fileUrl,
     fileName: doc.fileName,
+    referenceText: doc.referenceText,
     schoolName: doc.schoolName,
     city: doc.city,
     status: doc.status,
@@ -92,6 +94,7 @@ export async function createAssignment(req: Request, res: Response, next: NextFu
       questionTypes: body.questionTypes,
       additionalInstructions: body.additionalInstructions,
       fileName: body.fileName,
+      referenceText: body.referenceText,
       schoolName: body.schoolName,
       city: body.city,
       status: 'generating',

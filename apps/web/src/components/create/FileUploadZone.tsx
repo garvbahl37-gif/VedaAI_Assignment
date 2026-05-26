@@ -2,15 +2,28 @@
 
 import { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { UploadCloud, X } from 'lucide-react';
+import { UploadCloud, X, Loader2, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/cn';
+
+export type ReferenceStatus = 'idle' | 'extracting' | 'ready' | 'unsupported' | 'error';
 
 interface FileUploadZoneProps {
   file: File | null;
   onFile: (file: File | null) => void;
+  status?: ReferenceStatus;
+  pages?: number;
+  truncated?: boolean;
+  charCount?: number;
 }
 
-export function FileUploadZone({ file, onFile }: FileUploadZoneProps) {
+export function FileUploadZone({
+  file,
+  onFile,
+  status = 'idle',
+  pages,
+  truncated,
+  charCount,
+}: FileUploadZoneProps) {
   const onDrop = useCallback(
     (accepted: File[]) => {
       if (accepted[0]) onFile(accepted[0]);
@@ -83,9 +96,75 @@ export function FileUploadZone({ file, onFile }: FileUploadZoneProps) {
           </>
         )}
       </div>
-      <p className="text-center text-[12.5px] text-ink-muted">
-        Upload images of your preferred document/image
-      </p>
+
+      {file && status !== 'idle' && (
+        <StatusLine
+          status={status}
+          pages={pages}
+          truncated={truncated}
+          charCount={charCount}
+        />
+      )}
+
+      {!file && (
+        <p className="text-center text-[12.5px] text-ink-muted">
+          Upload a chapter PDF or notes — questions will be based on its content.
+        </p>
+      )}
     </div>
   );
+}
+
+function StatusLine({
+  status,
+  pages,
+  truncated,
+  charCount,
+}: {
+  status: ReferenceStatus;
+  pages?: number;
+  truncated?: boolean;
+  charCount?: number;
+}) {
+  if (status === 'extracting') {
+    return (
+      <p className="text-center text-[12.5px] text-ink-muted inline-flex items-center justify-center gap-1.5 w-full">
+        <Loader2 size={12} className="animate-spin" />
+        Reading file content…
+      </p>
+    );
+  }
+
+  if (status === 'ready') {
+    return (
+      <p className="text-center text-[12.5px] text-emerald-700 inline-flex items-center justify-center gap-1.5 w-full">
+        <CheckCircle2 size={12} />
+        Content extracted
+        {pages ? ` (${pages} page${pages === 1 ? '' : 's'})` : ''}
+        {charCount ? ` · ${charCount.toLocaleString()} chars` : ''}
+        {truncated ? ' · truncated to first 50,000 chars' : ''}
+        {' — will be used to generate questions.'}
+      </p>
+    );
+  }
+
+  if (status === 'unsupported') {
+    return (
+      <p className="text-center text-[12.5px] text-amber-700 inline-flex items-center justify-center gap-1.5 w-full">
+        <AlertTriangle size={12} />
+        Images can&apos;t be read automatically. Use a PDF or TXT for content-aware questions.
+      </p>
+    );
+  }
+
+  if (status === 'error') {
+    return (
+      <p className="text-center text-[12.5px] text-red-600 inline-flex items-center justify-center gap-1.5 w-full">
+        <AlertTriangle size={12} />
+        Couldn&apos;t read this file — questions will use the title only.
+      </p>
+    );
+  }
+
+  return null;
 }

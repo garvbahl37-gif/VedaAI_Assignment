@@ -49,6 +49,7 @@ export interface Assignment {
   additionalInstructions?: string;
   fileUrl?: string;
   fileName?: string;
+  referenceText?: string;
   schoolName?: string;
   city?: string;
   status: AssignmentStatus;
@@ -107,6 +108,7 @@ export interface CreateAssignmentRequest {
   questionTypes: QuestionTypeRow[];
   additionalInstructions?: string;
   fileName?: string;
+  referenceText?: string;
   schoolName?: string;
   city?: string;
 }

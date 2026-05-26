@@ -9,7 +9,7 @@ Production-grade monorepo for **VedaAI**'s AI-powered teacher's workspace. The c
 ## Features
 
 ### Assignments (`/assignments`, `/assignments/create`, `/assignments/[id]/output`)
-- Multi-step create form with file upload (PDF / TXT / images up to 10 MB — kept as metadata), due date (DD-MM-YYYY with calendar pop), dynamic question-type table (counts + marks with white-pill steppers, configurable types from a shared enum), additional instructions textarea, and **voice-to-text dictation**.
+- Multi-step create form with file upload (PDF / TXT / images up to 10 MB — **PDF and TXT content is parsed in the browser via `pdfjs-dist` and fed into the generation prompt under a `REFERENCE MATERIAL` block**, so generated questions actually reference the uploaded chapter), due date (DD-MM-YYYY with calendar pop), dynamic question-type table (counts + marks with white-pill steppers, configurable types from a shared enum), additional instructions textarea, and **voice-to-text dictation**.
 - Zod-validated client-side and server-side; no empty or negative values can be submitted.
 - The submit handler enqueues a BullMQ job locally or runs the pipeline inline on serverless; the form then navigates to the output page where progress streams over WebSocket and the paper renders the moment generation completes.
 - Output page: dark banner with white Download pill, student-info block (Name / Roll Number / Section input lines), sections grouped with title + instruction, numbered questions with **color-coded** `[Easy] / [Moderate] / [Challenging]` difficulty tags and `[N Marks]` suffix, a separate Answer Key, and a **Regenerate** action that re-runs the pipeline.
@@ -159,7 +159,7 @@ vedaai/
 
 ## Tech stack
 
-**Frontend** — Next.js 14 (App Router) · TypeScript strict · Tailwind CSS · **Zustand** with `persist` middleware (4 of 7 stores persisted to `localStorage`) · React Hook Form + Zod · native WebSocket client (exponential backoff, max 5 attempts) · `@react-pdf/renderer` (real A4 PDF, not print-CSS) · `react-dropzone` (file upload) · `lucide-react` (icons) · `date-fns` (date helpers) · **Web Speech API** for voice-to-text dictation (`SpeechRecognition` / `webkitSpeechRecognition`, `en-IN`).
+**Frontend** — Next.js 14 (App Router) · TypeScript strict · Tailwind CSS · **Zustand** with `persist` middleware (4 of 7 stores persisted to `localStorage`) · React Hook Form + Zod · native WebSocket client (exponential backoff, max 5 attempts) · `@react-pdf/renderer` (real A4 PDF, not print-CSS) · `react-dropzone` (file upload) · `pdfjs-dist` (browser PDF text extraction, dynamic-imported to keep it out of SSR) · `lucide-react` (icons) · `date-fns` (date helpers) · **Web Speech API** for voice-to-text dictation (`SpeechRecognition` / `webkitSpeechRecognition`, `en-IN`).
 
 **Backend** — Node 20+ · Express · TypeScript strict · **Mongoose** · **Redis** (ioredis for BullMQ + node-redis for cache) · **BullMQ** worker with 3 retries and exponential backoff · `ws` WebSocket server with per-job rooms and heartbeat · **Google Gemini API** (configurable model, `responseMimeType: application/json`, thinking budget disabled on 2.5-series models).
 

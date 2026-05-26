@@ -1,5 +1,33 @@
 import type { IAssignment } from '../models/Assignment';
 
+const MAX_REFERENCE_CHARS = 12000;
+
+function buildReferenceBlock(referenceText?: string, fileName?: string): string {
+  if (!referenceText) return '';
+  const text = referenceText.trim();
+  if (text.length === 0) return '';
+
+  let body = text;
+  let truncated = false;
+  if (body.length > MAX_REFERENCE_CHARS) {
+    body = body.slice(0, MAX_REFERENCE_CHARS);
+    truncated = true;
+  }
+
+  const source = fileName ? ` (extracted from "${fileName}")` : '';
+  const note = truncated
+    ? '\n[...content truncated — first ' + MAX_REFERENCE_CHARS + ' characters shown...]'
+    : '';
+
+  return `
+REFERENCE MATERIAL${source}
+The teacher uploaded a reference document. Base your questions on this content where relevant — paraphrase and reframe rather than copying verbatim. If the reference is irrelevant to the title or class level, ignore it.
+
+---BEGIN REFERENCE---
+${body}${note}
+---END REFERENCE---`;
+}
+
 export function buildPrompt(assignment: IAssignment): string {
   const questionBreakdown = assignment.questionTypes
     .map((qt) => `- ${qt.numberOfQuestions} × "${qt.type}" (${qt.marks} marks each)`)
@@ -27,6 +55,8 @@ export function buildPrompt(assignment: IAssignment): string {
     ? `Use this exact schoolName in the output: "${schoolLine}".`
     : `Infer schoolName ("Delhi Public School, Sector-6, Bokaro" is the default).`;
 
+  const referenceBlock = buildReferenceBlock(assignment.referenceText, assignment.fileName);
+
   return `You are an expert exam paper generator for Indian schools (CBSE/ICSE standard).
 
 Generate a complete, structured question paper with the following specifications.
@@ -42,6 +72,7 @@ ${questionBreakdown}
 
 ADDITIONAL INSTRUCTIONS FROM TEACHER
 ${assignment.additionalInstructions?.trim() || 'Standard exam format. Infer subject and class level from the title.'}
+${referenceBlock}
 
 REQUIREMENTS
 1. Group questions into labeled Sections (Section A, B, C, …) — one section per question type, in the order given.

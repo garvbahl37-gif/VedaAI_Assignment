@@ -7,6 +7,10 @@ export interface CreateFormData {
   title: string;
   file: File | null;
   fileName: string;
+  referenceText: string;
+  referenceStatus: 'idle' | 'extracting' | 'ready' | 'unsupported' | 'error';
+  referencePages?: number;
+  referenceTruncated?: boolean;
   dueDate: string; // DD-MM-YYYY
   questionTypes: QuestionTypeRow[];
   additionalInstructions: string;
@@ -27,6 +31,10 @@ const initialData: CreateFormData = {
   title: '',
   file: null,
   fileName: '',
+  referenceText: '',
+  referenceStatus: 'idle',
+  referencePages: undefined,
+  referenceTruncated: false,
   dueDate: '',
   questionTypes: [
     { type: 'Multiple Choice Questions', numberOfQuestions: 5, marks: 2 },

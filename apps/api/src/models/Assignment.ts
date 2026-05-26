@@ -15,6 +15,7 @@ export interface IAssignment extends Document {
   additionalInstructions?: string;
   fileUrl?: string;
   fileName?: string;
+  referenceText?: string;
   schoolName?: string;
   city?: string;
   status: AssignmentStatus;
@@ -41,6 +42,7 @@ const AssignmentSchema = new Schema<IAssignment>(
     additionalInstructions: { type: String, default: '' },
     fileUrl: { type: String },
     fileName: { type: String },
+    referenceText: { type: String },
     schoolName: { type: String },
     city: { type: String },
     status: {
