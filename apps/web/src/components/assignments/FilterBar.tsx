@@ -9,29 +9,30 @@ interface FilterBarProps {
 
 export function FilterBar({ query, onQueryChange }: FilterBarProps) {
   return (
-    <div className="bg-white border border-line rounded-2xl shadow-[0_1px_2px_rgba(0,0,0,0.03)] h-14 px-4 lg:px-5 flex items-center gap-4">
+    <div className="bg-white border border-line rounded-2xl shadow-[0_1px_2px_rgba(0,0,0,0.03)] h-14 px-4 lg:px-5 flex items-center gap-3">
       <button
         type="button"
-        className="flex items-center gap-2 text-[13px] text-ink-muted hover:text-ink shrink-0"
+        className="flex items-center gap-2 text-[13px] text-ink-muted hover:text-ink active:text-ink shrink-0"
       >
         <Filter size={15} strokeWidth={1.8} />
         Filter By
       </button>
 
-      <div className="h-6 w-px bg-line shrink-0 mx-1" />
+      {/* Spacer pushes the search input to the right edge of the bar, matching the Figma layout. */}
+      <div className="flex-1" />
 
-      <div className="relative flex-1">
+      <div className="relative w-full max-w-[360px] shrink-0">
         <Search
           size={15}
           strokeWidth={1.8}
-          className="absolute left-0 top-1/2 -translate-y-1/2 text-ink-muted"
+          className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-muted pointer-events-none"
         />
         <input
           type="text"
           placeholder="Search Assignment"
           value={query}
           onChange={(e) => onQueryChange(e.target.value)}
-          className="w-full pl-7 bg-transparent text-[13px] text-ink placeholder:text-ink-muted focus:outline-none"
+          className="w-full h-9 pl-9 pr-3 rounded-full bg-white border border-line text-[13px] text-ink placeholder:text-ink-muted focus:outline-none focus:border-brand"
         />
       </div>
     </div>
