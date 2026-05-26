@@ -1,9 +1,11 @@
 'use client';
 
+import { useState } from 'react';
 import { ChevronDown, ArrowLeft, LayoutGrid, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useProfileStore } from '@/stores/profileStore';
 import { NotificationsButton } from '@/components/layout/NotificationsButton';
+import { ProfileEditDialog } from '@/components/layout/ProfileEditDialog';
 import { Avatar } from '@/components/ui/Avatar';
 
 interface TopHeaderProps {
@@ -20,6 +22,7 @@ export function TopHeader({
   const router = useRouter();
   const teacherName = useProfileStore((s) => s.teacherName) || 'John Doe';
   const photoUrl = useProfileStore((s) => s.photoUrl) || '';
+  const [editOpen, setEditOpen] = useState(false);
 
   return (
     <div className="sticky top-0 z-20 px-4 lg:px-6 pt-4 lg:pt-5 pb-3 bg-surface-page lg:rounded-t-2xl">
@@ -53,15 +56,22 @@ export function TopHeader({
           <NotificationsButton variant="desktop" />
         </div>
 
-        {/* Teacher pill (desktop only) */}
-        <div className="hidden lg:flex items-center gap-2 h-10 pl-1 pr-2 rounded-full hover:bg-surface-subtle cursor-pointer">
+        {/* Teacher pill (desktop only) — clickable, opens profile edit dialog */}
+        <button
+          type="button"
+          onClick={() => setEditOpen(true)}
+          className="hidden lg:flex items-center gap-2 h-10 pl-1 pr-2 rounded-full hover:bg-surface-subtle active:bg-line transition-colors"
+          aria-label="Edit your profile"
+        >
           <Avatar name={teacherName} photoUrl={photoUrl} size={32} />
           <span className="text-[13px] font-medium text-ink whitespace-nowrap">
             {teacherName}
           </span>
           <ChevronDown size={14} className="text-ink-muted shrink-0" />
-        </div>
+        </button>
       </div>
+
+      <ProfileEditDialog open={editOpen} onClose={() => setEditOpen(false)} />
     </div>
   );
 }
