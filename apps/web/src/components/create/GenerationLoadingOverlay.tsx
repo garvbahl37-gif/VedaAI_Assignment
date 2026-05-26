@@ -10,29 +10,24 @@ interface GenerationLoadingOverlayProps {
 
 const STAGES: { label: string; description: string; durationMs: number }[] = [
   {
-    label: 'Reading your reference material',
-    description: 'Extracting context from your uploaded file',
-    durationMs: 2500,
+    label: 'Analyzing your requirements',
+    description: 'Reviewing question types, marks, and reference material',
+    durationMs: 3500,
   },
   {
-    label: 'Building the AI prompt',
-    description: 'Structuring your requirements for the model',
-    durationMs: 3000,
+    label: 'Composing the question paper',
+    description: 'Drafting curriculum-aligned questions across each section',
+    durationMs: 15000,
   },
   {
-    label: 'Drafting curriculum-aligned questions',
-    description: 'Veda is calling Gemini to compose the paper',
-    durationMs: 14000,
-  },
-  {
-    label: 'Validating sections and difficulty mix',
-    description: 'Parsing the response and repairing any gaps',
+    label: 'Balancing difficulty and total marks',
+    description: 'Checking the section structure and answer key',
     durationMs: 4000,
   },
   {
     label: 'Finalising your paper',
-    description: 'Saving to the cloud and preparing the output',
-    durationMs: 2500,
+    description: 'Almost ready — preparing the output page',
+    durationMs: 3000,
   },
 ];
 
