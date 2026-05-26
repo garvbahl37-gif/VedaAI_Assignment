@@ -44,7 +44,7 @@ export function LogoMark({
     <svg
       width={size}
       height={size}
-      viewBox="0 0 32 32"
+      viewBox="0 0 64 64"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       aria-label="VedaAI"
@@ -52,26 +52,53 @@ export function LogoMark({
     >
       {!isBlack && (
         <defs>
-          <linearGradient id={`veda-${id}`} x1="6" y1="2" x2="26" y2="32" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#FF8A3D" />
-            <stop offset="45%" stopColor="#E25A12" />
+          <linearGradient
+            id={`veda-${id}`}
+            x1="14"
+            y1="4"
+            x2="50"
+            y2="64"
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop offset="0%" stopColor="#FF9A40" />
+            <stop offset="50%" stopColor="#E25A12" />
             <stop offset="100%" stopColor="#2A1208" />
           </linearGradient>
         </defs>
       )}
+
+      {/* Rounded-square background */}
       <rect
-        width="32"
-        height="32"
-        rx="7.5"
-        fill={isBlack ? '#1A1A1A' : `url(#veda-${id})`}
+        width="64"
+        height="64"
+        rx="14"
+        fill={isBlack ? '#1F1F1F' : `url(#veda-${id})`}
       />
+
+      {/*
+        Chunky filled V with rounded top corners and a soft notch at the
+        bottom where the two strokes meet. Designed as two parallelograms
+        sharing the bottom point — left stroke + right stroke.
+      */}
       <path
-        d="M8 10 L16 24 L24 10"
-        stroke="#FFFFFF"
-        strokeWidth="3.2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        fill="none"
+        d="
+          M 13 16
+          Q 13 13.5 15.5 13.5
+          L 23.5 13.5
+          Q 25.7 13.5 26.6 15.7
+          L 32 32
+          L 37.4 15.7
+          Q 38.3 13.5 40.5 13.5
+          L 48.5 13.5
+          Q 51 13.5 51 16
+          L 51 16.5
+          L 36.3 48.6
+          Q 34.5 52.5 32 52.5
+          Q 29.5 52.5 27.7 48.6
+          L 13 16.5
+          Z
+        "
+        fill="white"
       />
     </svg>
   );

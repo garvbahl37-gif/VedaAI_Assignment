@@ -71,6 +71,17 @@ export default function SettingsPage() {
                 markSaved('school');
               }}
             />
+            <div className="md:col-span-2">
+              <SettingField
+                label="Profile Photo URL"
+                value={profile.photoUrl ?? ''}
+                placeholder="https://… (paste any image URL; initials shown if empty)"
+                onCommit={(v) => {
+                  setProfile({ photoUrl: v });
+                  markSaved('school');
+                }}
+              />
+            </div>
           </div>
         </SettingsCard>
 

@@ -4,6 +4,7 @@ import { ChevronDown, ArrowLeft, LayoutGrid, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useProfileStore } from '@/stores/profileStore';
 import { NotificationsButton } from '@/components/layout/NotificationsButton';
+import { Avatar } from '@/components/ui/Avatar';
 
 interface TopHeaderProps {
   title?: string;
@@ -18,6 +19,7 @@ export function TopHeader({
 }: TopHeaderProps) {
   const router = useRouter();
   const teacherName = useProfileStore((s) => s.teacherName) || 'John Doe';
+  const photoUrl = useProfileStore((s) => s.photoUrl) || '';
 
   return (
     <div className="sticky top-0 z-20 px-4 lg:px-6 pt-4 lg:pt-5 pb-3 bg-surface-page lg:rounded-t-2xl">
@@ -53,17 +55,7 @@ export function TopHeader({
 
         {/* Teacher pill (desktop only) */}
         <div className="hidden lg:flex items-center gap-2 h-10 pl-1 pr-2 rounded-full hover:bg-surface-subtle cursor-pointer">
-          <div className="h-8 w-8 rounded-full bg-amber-100 overflow-hidden ring-1 ring-white">
-            <svg viewBox="0 0 40 40" width="32" height="32" aria-hidden="true">
-              <rect width="40" height="40" fill="#F3DDC1" />
-              <path d="M10 18 Q20 8 30 18 L30 21 L10 21 Z" fill="#D9D9D9" />
-              <circle cx="20" cy="24" r="5.5" fill="#E8B58A" />
-              <circle cx="18" cy="23.5" r="0.7" fill="#3B2415" />
-              <circle cx="22" cy="23.5" r="0.7" fill="#3B2415" />
-              <path d="M17.5 26 Q20 27.3 22.5 26" stroke="#5C3A21" strokeWidth="0.9" fill="none" strokeLinecap="round" />
-              <path d="M10 36 Q20 28 30 36 L30 40 L10 40 Z" fill="#9CA3AF" />
-            </svg>
-          </div>
+          <Avatar name={teacherName} photoUrl={photoUrl} size={32} />
           <span className="text-[13px] font-medium text-ink whitespace-nowrap">
             {teacherName}
           </span>

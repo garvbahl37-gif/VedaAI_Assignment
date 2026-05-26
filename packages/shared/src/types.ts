@@ -37,6 +37,7 @@ export interface SchoolProfile {
   city: string;
   principalName?: string;
   teacherName?: string;
+  photoUrl?: string;
   defaultClass?: string;
   defaultSubject?: string;
 }

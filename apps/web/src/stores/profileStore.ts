@@ -14,6 +14,7 @@ const DEFAULT_PROFILE: SchoolProfile = {
   city: 'Bokaro Steel City',
   principalName: '',
   teacherName: 'John Doe',
+  photoUrl: '',
   defaultClass: '',
   defaultSubject: '',
 };

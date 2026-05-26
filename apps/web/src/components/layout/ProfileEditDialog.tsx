@@ -21,6 +21,7 @@ export function ProfileEditDialog({ open, onClose }: ProfileEditDialogProps) {
     city: profile.city,
     principalName: profile.principalName ?? '',
     teacherName: profile.teacherName ?? '',
+    photoUrl: profile.photoUrl ?? '',
     defaultClass: profile.defaultClass ?? '',
     defaultSubject: profile.defaultSubject ?? '',
   });
@@ -33,6 +34,7 @@ export function ProfileEditDialog({ open, onClose }: ProfileEditDialogProps) {
         city: profile.city,
         principalName: profile.principalName ?? '',
         teacherName: profile.teacherName ?? '',
+        photoUrl: profile.photoUrl ?? '',
         defaultClass: profile.defaultClass ?? '',
         defaultSubject: profile.defaultSubject ?? '',
       });
@@ -58,6 +60,7 @@ export function ProfileEditDialog({ open, onClose }: ProfileEditDialogProps) {
       city: draft.city.trim(),
       principalName: draft.principalName?.trim() || '',
       teacherName: draft.teacherName?.trim() || '',
+      photoUrl: draft.photoUrl?.trim() || '',
       defaultClass: draft.defaultClass?.trim() || '',
       defaultSubject: draft.defaultSubject?.trim() || '',
     });
@@ -119,6 +122,12 @@ export function ProfileEditDialog({ open, onClose }: ProfileEditDialogProps) {
             value={draft.teacherName ?? ''}
             placeholder="John Doe"
             onChange={(v) => setDraft((d) => ({ ...d, teacherName: v }))}
+          />
+          <Field
+            label="Profile Photo URL"
+            value={draft.photoUrl ?? ''}
+            placeholder="https://… (optional — initials shown if empty)"
+            onChange={(v) => setDraft((d) => ({ ...d, photoUrl: v }))}
           />
           <div className="grid grid-cols-2 gap-3">
             <Field

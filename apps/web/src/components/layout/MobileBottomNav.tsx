@@ -20,10 +20,10 @@ export function MobileBottomNav() {
       {/* Floating + button — small, orange/white, just above the nav */}
       <Link
         href="/assignments/create"
-        className="lg:hidden fixed bottom-24 right-4 z-30 h-11 w-11 rounded-full bg-brand shadow-lg flex items-center justify-center text-white hover:scale-105 active:scale-95 transition"
+        className="lg:hidden fixed bottom-24 right-4 z-30 h-12 w-12 rounded-full bg-white shadow-lg ring-1 ring-line flex items-center justify-center text-brand hover:scale-105 active:scale-95 transition"
         aria-label="Create assignment"
       >
-        <Plus size={20} strokeWidth={2.4} />
+        <Plus size={22} strokeWidth={2.6} />
       </Link>
 
       <nav className="lg:hidden fixed bottom-3 left-3 right-3 z-20 bg-ink rounded-2xl shadow-xl h-16 grid grid-cols-4 pb-[env(safe-area-inset-bottom)] overflow-hidden">
