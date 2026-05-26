@@ -1,37 +1,16 @@
 'use client';
 
-import { useState } from 'react';
 import { Logo } from '@/components/brand/Logo';
-import { Bell, Menu } from 'lucide-react';
-import { useNotificationsStore, unreadCount } from '@/stores/notificationsStore';
-import { NotificationsPopover } from '@/components/layout/NotificationsPopover';
+import { Menu } from 'lucide-react';
+import { NotificationsButton } from '@/components/layout/NotificationsButton';
 
 export function MobileHeader() {
-  const items = useNotificationsStore((s) => s.items);
-  const unread = unreadCount(items);
-  const [notifOpen, setNotifOpen] = useState(false);
-
   return (
     <header className="lg:hidden sticky top-0 z-20 bg-surface-page px-3 pt-3 pb-2">
       <div className="bg-white rounded-xl shadow-sm border border-line h-14 px-3 flex items-center justify-between">
         <Logo size={24} />
         <div className="flex items-center gap-2">
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setNotifOpen((v) => !v)}
-              className="relative h-9 w-9 rounded-full hover:bg-surface-subtle flex items-center justify-center text-ink"
-              aria-label={`Notifications${unread > 0 ? ` (${unread} unread)` : ''}`}
-            >
-              <Bell size={18} strokeWidth={1.8} />
-              {unread > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] px-1 rounded-full bg-red-500 text-white text-[9.5px] font-bold flex items-center justify-center ring-2 ring-white">
-                  {unread > 9 ? '9+' : unread}
-                </span>
-              )}
-            </button>
-            <NotificationsPopover open={notifOpen} onClose={() => setNotifOpen(false)} />
-          </div>
+          <NotificationsButton variant="mobile" />
 
           <div className="h-8 w-8 rounded-full bg-gradient-to-br from-amber-200 via-orange-300 to-rose-300 flex items-center justify-center text-white text-[10px] font-semibold overflow-hidden ring-2 ring-white">
             <svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true">
@@ -44,7 +23,7 @@ export function MobileHeader() {
           </div>
           <button
             type="button"
-            className="h-9 w-9 rounded-full hover:bg-surface-subtle flex items-center justify-center text-ink"
+            className="h-9 w-9 rounded-full hover:bg-surface-subtle active:bg-line flex items-center justify-center text-ink transition-colors"
             aria-label="Menu"
           >
             <Menu size={20} strokeWidth={1.8} />

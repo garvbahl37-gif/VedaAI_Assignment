@@ -65,6 +65,7 @@ export async function connectRedis(): Promise<void> {
 // ──────────────────────────────────────────────────────────
 const PAPER_TTL_SECONDS = 60 * 60 * 24; // 24h
 const JOB_TTL_SECONDS = 60 * 60;        // 1h
+const LIST_TTL_SECONDS = 60 * 5;        // 5 min — long enough to absorb a UI session, short enough to never feel stale
 
 async function ensureClient(): Promise<RedisClient | null> {
   try {
@@ -105,5 +106,24 @@ export const cacheHelpers = {
     const c = await ensureClient();
     if (!c) return;
     await c.setEx(`job:status:${jobId}`, JOB_TTL_SECONDS, status);
+  },
+
+  // Assignment list cache — short TTL plus explicit invalidation on
+  // create/delete/regenerate so the page reflects mutations immediately.
+  async getAssignmentList<T>(): Promise<T | null> {
+    const c = await ensureClient();
+    if (!c) return null;
+    const raw = await c.get('assignments:list');
+    return raw ? (JSON.parse(raw) as T) : null;
+  },
+  async setAssignmentList(data: unknown): Promise<void> {
+    const c = await ensureClient();
+    if (!c) return;
+    await c.setEx('assignments:list', LIST_TTL_SECONDS, JSON.stringify(data));
+  },
+  async invalidateAssignmentList(): Promise<void> {
+    const c = await ensureClient();
+    if (!c) return;
+    await c.del('assignments:list');
   },
 };

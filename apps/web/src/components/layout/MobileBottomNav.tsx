@@ -2,12 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Presentation, BookOpen, Wrench, Plus } from 'lucide-react';
+import { Home, ClipboardList, BookOpen, Wrench, Plus } from 'lucide-react';
 import { cn } from '@/lib/cn';
 
 const TABS = [
   { label: 'Home', href: '/home', icon: Home },
-  { label: 'My Groups', href: '/groups', icon: Presentation },
+  { label: 'Assignments', href: '/assignments', icon: ClipboardList },
   { label: 'Library', href: '/library', icon: BookOpen },
   { label: 'AI Toolkit', href: '/toolkit', icon: Wrench },
 ];
@@ -35,7 +35,7 @@ export function MobileBottomNav() {
             <Link
               key={t.href}
               href={t.href}
-              className="relative flex flex-col items-center justify-center gap-0.5 text-white/70 hover:text-white"
+              className="relative flex flex-col items-center justify-center gap-0.5 text-white/70 hover:text-white active:bg-white/5 transition-colors"
             >
               <span
                 className={cn(

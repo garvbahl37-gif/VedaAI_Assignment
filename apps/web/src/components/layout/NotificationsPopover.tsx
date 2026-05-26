@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import {
   Bell,
@@ -49,91 +48,81 @@ export function NotificationsPopover({ open, onClose }: NotificationsPopoverProp
   const markAllRead = useNotificationsStore((s) => s.markAllRead);
   const markRead = useNotificationsStore((s) => s.markRead);
   const clear = useNotificationsStore((s) => s.clear);
-  const popoverRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const onClick = (e: MouseEvent) => {
-      if (popoverRef.current && !popoverRef.current.contains(e.target as Node)) {
-        onClose();
-      }
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    document.addEventListener('mousedown', onClick);
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.removeEventListener('mousedown', onClick);
-      document.removeEventListener('keydown', onKey);
-    };
-  }, [open, onClose]);
 
   if (!open) return null;
 
   return (
-    <div
-      ref={popoverRef}
-      className="
-        fixed left-4 right-4 top-[4.5rem]
-        sm:absolute sm:left-auto sm:right-0 sm:top-12
-        sm:w-[360px] sm:max-w-[90vw]
-        z-30 bg-white border border-line rounded-2xl shadow-2xl overflow-hidden
-      "
-    >
-      <div className="flex items-center justify-between px-4 py-3 border-b border-line">
-        <h3 className="text-[14px] font-semibold text-ink">Notifications</h3>
-        {items.length > 0 && (
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
-              onClick={markAllRead}
-              className="inline-flex items-center gap-1 h-7 px-2.5 rounded-full text-[11.5px] text-ink-muted hover:bg-surface-subtle hover:text-ink"
-              title="Mark all as read"
-            >
-              <CheckCheck size={12} />
-              Mark all read
-            </button>
-            <button
-              type="button"
-              onClick={clear}
-              className="inline-flex items-center gap-1 h-7 px-2.5 rounded-full text-[11.5px] text-ink-muted hover:bg-red-50 hover:text-red-600"
-              title="Clear all"
-            >
-              <Trash2 size={12} />
-              Clear
-            </button>
-          </div>
-        )}
-      </div>
+    <>
+      {/* Mobile-only backdrop — dims the page behind the popover so it reads as
+          modal-ish on small screens. Desktop keeps the open-air popover feel. */}
+      <div
+        className="fixed inset-0 z-40 bg-black/30 sm:hidden"
+        onClick={onClose}
+        aria-hidden="true"
+      />
 
-      <div className="max-h-[420px] overflow-y-auto">
-        {items.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 px-6">
-            <div className="h-12 w-12 rounded-full bg-surface-subtle flex items-center justify-center mb-3">
-              <Bell size={20} className="text-ink-muted" strokeWidth={1.6} />
+      <div
+        className="
+          fixed left-4 right-4 top-[4.5rem]
+          sm:absolute sm:left-auto sm:right-0 sm:top-12
+          sm:w-[360px] sm:max-w-[90vw]
+          z-50 bg-white border border-line rounded-2xl shadow-2xl overflow-hidden
+        "
+      >
+        <div className="flex items-center justify-between px-4 py-3 border-b border-line">
+          <h3 className="text-[14px] font-semibold text-ink">Notifications</h3>
+          {items.length > 0 && (
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={markAllRead}
+                className="inline-flex items-center gap-1 h-7 px-2.5 rounded-full text-[11.5px] text-ink-muted hover:bg-surface-subtle hover:text-ink"
+                title="Mark all as read"
+              >
+                <CheckCheck size={12} />
+                Mark all read
+              </button>
+              <button
+                type="button"
+                onClick={clear}
+                className="inline-flex items-center gap-1 h-7 px-2.5 rounded-full text-[11.5px] text-ink-muted hover:bg-red-50 hover:text-red-600"
+                title="Clear all"
+              >
+                <Trash2 size={12} />
+                Clear
+              </button>
             </div>
-            <p className="text-[13px] font-medium text-ink">No notifications yet</p>
-            <p className="mt-1 text-[12px] text-ink-muted text-center max-w-[240px]">
-              Activity from your assignments, quizzes, and groups will show up here.
-            </p>
-          </div>
-        ) : (
-          <ul>
-            {items.map((n) => (
-              <NotificationRow
-                key={n.id}
-                notification={n}
-                onClick={() => {
-                  markRead(n.id);
-                  if (n.link) onClose();
-                }}
-              />
-            ))}
-          </ul>
-        )}
+          )}
+        </div>
+
+        <div className="max-h-[420px] overflow-y-auto">
+          {items.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 px-6">
+              <div className="h-12 w-12 rounded-full bg-surface-subtle flex items-center justify-center mb-3">
+                <Bell size={20} className="text-ink-muted" strokeWidth={1.6} />
+              </div>
+              <p className="text-[13px] font-medium text-ink">No notifications yet</p>
+              <p className="mt-1 text-[12px] text-ink-muted text-center max-w-[240px]">
+                Activity from your assignments, quizzes, and groups will show up here.
+              </p>
+            </div>
+          ) : (
+            <ul>
+              {items.map((n) => (
+                <NotificationRow
+                  key={n.id}
+                  notification={n}
+                  onClick={() => {
+                    markRead(n.id);
+                    if (n.link) onClose();
+                  }}
+                />
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -148,7 +137,7 @@ function NotificationRow({
   const colorClass = COLOR_BY_TYPE[notification.type] ?? COLOR_BY_TYPE.info;
 
   const body = (
-    <div className="flex items-start gap-3 px-4 py-3 hover:bg-surface-page transition-colors cursor-pointer">
+    <div className="flex items-start gap-3 px-4 py-3 hover:bg-surface-page active:bg-surface-subtle transition-colors cursor-pointer">
       <div
         className={`h-9 w-9 rounded-full shrink-0 flex items-center justify-center ${colorClass}`}
       >

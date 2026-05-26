@@ -1,11 +1,9 @@
 'use client';
 
-import { useState } from 'react';
-import { Bell, ChevronDown, ArrowLeft, LayoutGrid, Sparkles } from 'lucide-react';
+import { ChevronDown, ArrowLeft, LayoutGrid, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useProfileStore } from '@/stores/profileStore';
-import { useNotificationsStore, unreadCount } from '@/stores/notificationsStore';
-import { NotificationsPopover } from '@/components/layout/NotificationsPopover';
+import { NotificationsButton } from '@/components/layout/NotificationsButton';
 
 interface TopHeaderProps {
   title?: string;
@@ -20,9 +18,6 @@ export function TopHeader({
 }: TopHeaderProps) {
   const router = useRouter();
   const teacherName = useProfileStore((s) => s.teacherName) || 'John Doe';
-  const items = useNotificationsStore((s) => s.items);
-  const unread = unreadCount(items);
-  const [notifOpen, setNotifOpen] = useState(false);
 
   return (
     <div className="sticky top-0 z-20 px-4 lg:px-6 pt-4 lg:pt-5 pb-3 bg-surface-page lg:rounded-t-2xl">
@@ -30,7 +25,7 @@ export function TopHeader({
         <button
           type="button"
           onClick={() => (showBack ? router.back() : undefined)}
-          className="h-10 w-10 rounded-full bg-white border border-line flex items-center justify-center text-ink-muted shrink-0 hover:bg-surface-subtle"
+          className="h-10 w-10 rounded-full bg-white border border-line flex items-center justify-center text-ink-muted shrink-0 hover:bg-surface-subtle active:bg-line transition-colors"
           aria-label="Back"
         >
           <ArrowLeft size={16} strokeWidth={1.8} />
@@ -52,21 +47,8 @@ export function TopHeader({
         <div className="lg:hidden h-10 w-10 shrink-0" aria-hidden="true" />
 
         {/* Bell + popover (desktop only — MobileHeader has its own) */}
-        <div className="relative hidden lg:block">
-          <button
-            type="button"
-            onClick={() => setNotifOpen((v) => !v)}
-            className="relative h-10 w-10 rounded-full hover:bg-surface-subtle flex items-center justify-center text-ink-muted"
-            aria-label={`Notifications${unread > 0 ? ` (${unread} unread)` : ''}`}
-          >
-            <Bell size={18} strokeWidth={1.7} />
-            {unread > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-white">
-                {unread > 9 ? '9+' : unread}
-              </span>
-            )}
-          </button>
-          <NotificationsPopover open={notifOpen} onClose={() => setNotifOpen(false)} />
+        <div className="hidden lg:block">
+          <NotificationsButton variant="desktop" />
         </div>
 
         {/* Teacher pill (desktop only) */}

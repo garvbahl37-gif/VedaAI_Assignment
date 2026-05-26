@@ -222,7 +222,7 @@ GEMINI_API_KEY=... npm run docker:full
 |---|---|---|
 | `GET`    | `/health`                                       | Health check |
 | `POST`   | `/api/assignments`                              | Create assignment, enqueue (or inline) generation. Body includes optional `schoolName` + `city` from the profile store. Returns `{ assignment, jobId, paperId? }`. |
-| `GET`    | `/api/assignments`                              | List all assignments |
+| `GET`    | `/api/assignments`                              | List all assignments (Redis-cached 5 min; `X-Cache: HIT/MISS` header) |
 | `GET`    | `/api/assignments/:id`                          | Get a single assignment |
 | `DELETE` | `/api/assignments/:id`                          | Delete assignment + its paper + cache |
 | `GET`    | `/api/assignments/:id/paper`                    | Generated paper (Redis-cached 24 h) |
@@ -368,6 +368,7 @@ Per-feature accent colors are used where they aid scanning:
 
 - **Monorepo with `packages/shared`** — a single source of truth for `Assignment`, `Section`, `Question`, `SchoolProfile`, `WSMessage`, `QuickQuizRequest`, etc. Both apps import the same types; no drift between frontend expectations and backend payloads.
 - **Async by default, inline as fallback** — locally the API enqueues to BullMQ and the worker processes in the background while WebSocket events stream progress. On Vercel (serverless) the exact same `runGenerationPipeline()` function runs inline inside the HTTP request. One pipeline, two execution models.
+- **Redis caching at two layers** — generated paper bodies cache for 24 h keyed by assignment id (invalidated on regenerate / delete); the assignment list caches for 5 min keyed globally (invalidated on create / delete / regenerate). The list cache turns the dashboard's repeat-loads into ~5-10 ms responses instead of Mongo round-trips, which is the dominant cost on serverless cold starts. Responses carry an `X-Cache: HIT|MISS` header for inspection.
 - **Two generation paths, one prompt-parse discipline** — the full Assignment pipeline and the Toolkit Quick Quiz both build a strict JSON schema prompt, parse with truncation repair, validate the structure, and only then surface to the UI. Neither shows raw AI text to the user.
 - **Profile → prompt → output** — the sidebar profile card is not cosmetic. Editing the school name updates a Zustand store persisted in `localStorage`; the create-assignment page reads it, the API stores it on the assignment, the prompt builder injects it as a directive to Gemini, and the printed PDF shows it at the top of the question paper. End-to-end change in three clicks.
 - **Activity surfaces in the bell** — every meaningful user action (assignment created, paper ready, quiz generated, quiz saved, group created, profile updated) writes a typed entry into the notifications store. The bell badge shows unread count; the popover acts as a recent-activity log so a teacher returning to the app sees what's changed.

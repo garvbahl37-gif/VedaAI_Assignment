@@ -68,8 +68,18 @@ function parseDueDate(input: string): Date {
 
 export async function listAssignments(_req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
+    const cached = await cacheHelpers.getAssignmentList<{ assignments: AssignmentDTO[] }>();
+    if (cached) {
+      res.setHeader('X-Cache', 'HIT');
+      res.json(cached);
+      return;
+    }
+
     const docs = await Assignment.find().sort({ createdAt: -1 }).exec();
-    res.json({ assignments: docs.map(toAssignmentDTO) });
+    const payload = { assignments: docs.map(toAssignmentDTO) };
+    await cacheHelpers.setAssignmentList(payload);
+    res.setHeader('X-Cache', 'MISS');
+    res.json(payload);
   } catch (err) {
     next(err);
   }
@@ -99,6 +109,7 @@ export async function createAssignment(req: Request, res: Response, next: NextFu
       city: body.city,
       status: 'generating',
     });
+    await cacheHelpers.invalidateAssignmentList();
 
     if (IS_SERVERLESS) {
       // Run the pipeline INLINE — no background Worker on serverless.
@@ -138,6 +149,7 @@ export async function deleteAssignment(req: Request, res: Response, next: NextFu
     await GeneratedPaper.deleteMany({ assignmentId: doc._id });
     await cacheHelpers.invalidatePaper(doc._id.toString());
     await doc.deleteOne();
+    await cacheHelpers.invalidateAssignmentList();
     res.status(204).send();
   } catch (err) {
     next(err);
@@ -183,6 +195,7 @@ export async function regenerateAssignment(req: Request, res: Response, next: Ne
     if (!doc) throw new HttpError(404, 'Assignment not found');
 
     await cacheHelpers.invalidatePaper(doc._id.toString());
+    await cacheHelpers.invalidateAssignmentList();
     doc.status = 'generating';
 
     if (IS_SERVERLESS) {
