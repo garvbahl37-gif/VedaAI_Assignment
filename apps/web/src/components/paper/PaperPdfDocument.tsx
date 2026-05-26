@@ -5,31 +5,111 @@ import type { GeneratedPaper } from '@vedaai/shared';
 
 const styles = StyleSheet.create({
   page: {
-    padding: 36,
+    paddingTop: 40,
+    paddingBottom: 40,
+    paddingLeft: 44,
+    paddingRight: 44,
     fontSize: 11,
     fontFamily: 'Helvetica',
     color: '#1A1A1A',
-    lineHeight: 1.4,
+    lineHeight: 1.45,
   },
-  header: { textAlign: 'center', marginBottom: 10 },
-  schoolName: { fontSize: 14, fontFamily: 'Helvetica-Bold' },
-  subject: { fontSize: 12, marginTop: 4 },
-  className: { fontSize: 10, color: '#6B7280' },
-  divider: { borderBottomWidth: 1, borderBottomColor: '#E5E7EB', marginVertical: 8 },
-  row: { flexDirection: 'row', justifyContent: 'space-between' },
+
+  // ── Header ───────────────────────────────────────────
+  header: { textAlign: 'center', marginBottom: 14 },
+  schoolName: {
+    fontSize: 16,
+    fontFamily: 'Helvetica-Bold',
+    color: '#1A1A1A',
+    letterSpacing: 0.2,
+  },
+  subject: {
+    fontSize: 12.5,
+    marginTop: 6,
+    color: '#1A1A1A',
+  },
+  className: {
+    fontSize: 10.5,
+    marginTop: 4,
+    color: '#6B7280',
+  },
+
+  // ── Time + Marks row ─────────────────────────────────
+  timeMarksRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 14,
+    fontSize: 11,
+  },
   bold: { fontFamily: 'Helvetica-Bold' },
-  italic: { fontFamily: 'Helvetica-Oblique', color: '#6B7280', fontSize: 9 },
-  studentRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 6, fontSize: 10 },
-  studentField: { width: '32%' },
-  sectionTitle: { fontSize: 11, fontFamily: 'Helvetica-Bold', textTransform: 'uppercase', marginTop: 14 },
-  sectionSub: { fontSize: 10, color: '#6B7280', marginBottom: 6, flexDirection: 'row', justifyContent: 'space-between' },
-  question: { flexDirection: 'row', marginBottom: 6, fontSize: 10 },
-  qNum: { width: 16, fontFamily: 'Helvetica-Bold' },
+
+  // ── General instructions ─────────────────────────────
+  instructions: { marginTop: 10 },
+  instructionLine: {
+    fontFamily: 'Helvetica-Oblique',
+    color: '#6B7280',
+    fontSize: 10,
+    marginBottom: 3,
+  },
+
+  // ── Student info row (Name / Roll / Section) ─────────
+  studentRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 16,
+    fontSize: 11,
+  },
+  studentField: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+  },
+  studentLabel: {
+    fontFamily: 'Helvetica-Bold',
+    fontSize: 11,
+    marginRight: 4,
+  },
+  studentBlank: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#1A1A1A',
+    width: 130,
+    height: 12,
+  },
+
+  divider: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+    marginTop: 14,
+    marginBottom: 12,
+  },
+
+  // ── Sections + questions ─────────────────────────────
+  sectionLabel: {
+    fontSize: 12,
+    fontFamily: 'Helvetica-Bold',
+    textAlign: 'center',
+    marginTop: 12,
+    marginBottom: 6,
+  },
+  sectionHeading: {
+    fontSize: 10.5,
+    fontFamily: 'Helvetica-Bold',
+    marginBottom: 1,
+  },
+  sectionInstruction: {
+    fontFamily: 'Helvetica-Oblique',
+    color: '#6B7280',
+    fontSize: 9.5,
+    marginBottom: 6,
+  },
+  question: { flexDirection: 'row', marginBottom: 6, fontSize: 10.5 },
+  qNum: { width: 18, fontFamily: 'Helvetica-Bold' },
   qBody: { flex: 1, paddingRight: 6 },
-  qMarks: { width: 60, textAlign: 'right', fontSize: 9, color: '#6B7280' },
-  difficulty: { fontSize: 8, marginTop: 2, color: '#6B7280' },
-  optionRow: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 2, fontSize: 9, color: '#374151' },
+  qMarks: { width: 60, textAlign: 'right', fontSize: 9.5, color: '#6B7280' },
+  difficulty: { fontSize: 8.5, marginTop: 2, color: '#6B7280', fontFamily: 'Helvetica-Oblique' },
+  optionRow: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 2, fontSize: 9.5, color: '#374151' },
   option: { width: '50%', paddingRight: 8, marginTop: 1 },
+
+  // ── Answer key ───────────────────────────────────────
   answerKey: {
     marginTop: 18,
     paddingTop: 10,
@@ -37,20 +117,40 @@ const styles = StyleSheet.create({
     borderTopColor: '#E5E7EB',
   },
   answerKeyTitle: { fontSize: 12, fontFamily: 'Helvetica-Bold', marginBottom: 6 },
-  answerLine: { fontSize: 9, marginBottom: 2 },
+  answerLine: { fontSize: 9.5, marginBottom: 2 },
+
+  endMark: {
+    textAlign: 'center',
+    fontSize: 10,
+    fontFamily: 'Helvetica-Bold',
+    marginTop: 14,
+    marginBottom: 4,
+  },
 });
 
 export function PaperPdfDocument({ paper }: { paper: GeneratedPaper }) {
+  const instructions =
+    paper.generalInstructions && paper.generalInstructions.length > 0
+      ? paper.generalInstructions
+      : [
+          'Read all questions carefully before attempting.',
+          'Attempt all questions from all sections.',
+          'Show all calculations clearly for numerical problems.',
+          'The marks allotted to each question are indicated against it.',
+        ];
+
   return (
     <Document title={`${paper.subject} - ${paper.className}`}>
       <Page size="A4" style={styles.page}>
+        {/* ── Header ─────────────────────────────────── */}
         <View style={styles.header}>
           <Text style={styles.schoolName}>{paper.schoolName}</Text>
           <Text style={styles.subject}>{paper.subject}</Text>
           <Text style={styles.className}>{paper.className}</Text>
         </View>
 
-        <View style={styles.row}>
+        {/* ── Time + Maximum Marks ───────────────────── */}
+        <View style={styles.timeMarksRow}>
           <Text>
             <Text style={styles.bold}>Time Allowed: </Text>
             {paper.timeAllowed}
@@ -61,31 +161,39 @@ export function PaperPdfDocument({ paper }: { paper: GeneratedPaper }) {
           </Text>
         </View>
 
-        {paper.generalInstructions && paper.generalInstructions.length > 0 && (
-          <View style={{ marginTop: 6 }}>
-            {paper.generalInstructions.map((line, i) => (
-              <Text key={i} style={styles.italic}>
-                • {line}
-              </Text>
-            ))}
-          </View>
-        )}
+        {/* ── General Instructions ───────────────────── */}
+        <View style={styles.instructions}>
+          {instructions.map((line, i) => (
+            <Text key={i} style={styles.instructionLine}>
+              • {line}
+            </Text>
+          ))}
+        </View>
 
+        {/* ── Student Info (Name / Roll No. / Section) ── */}
         <View style={styles.studentRow}>
-          <Text style={styles.studentField}>Name: ____________________</Text>
-          <Text style={styles.studentField}>Roll No.: __________________</Text>
-          <Text style={styles.studentField}>Section: ___________________</Text>
+          <View style={styles.studentField}>
+            <Text style={styles.studentLabel}>Name:</Text>
+            <View style={styles.studentBlank} />
+          </View>
+          <View style={styles.studentField}>
+            <Text style={styles.studentLabel}>Roll No.:</Text>
+            <View style={styles.studentBlank} />
+          </View>
+          <View style={styles.studentField}>
+            <Text style={styles.studentLabel}>Section:</Text>
+            <View style={styles.studentBlank} />
+          </View>
         </View>
 
         <View style={styles.divider} />
 
+        {/* ── Sections ───────────────────────────────── */}
         {paper.sections.map((section) => (
           <View key={section.label} wrap={false}>
-            <Text style={styles.sectionTitle}>{section.label}</Text>
-            <View style={styles.sectionSub}>
-              <Text>{section.title}</Text>
-              <Text style={styles.italic}>({section.instruction})</Text>
-            </View>
+            <Text style={styles.sectionLabel}>{section.label}</Text>
+            <Text style={styles.sectionHeading}>{section.title}</Text>
+            <Text style={styles.sectionInstruction}>{section.instruction}</Text>
 
             {section.questions.map((q) => (
               <View key={`${section.label}-${q.number}`} style={styles.question}>
@@ -111,6 +219,9 @@ export function PaperPdfDocument({ paper }: { paper: GeneratedPaper }) {
           </View>
         ))}
 
+        <Text style={styles.endMark}>— End of Question Paper —</Text>
+
+        {/* ── Answer Key (new page) ──────────────────── */}
         <View style={styles.answerKey} break>
           <Text style={styles.answerKeyTitle}>Answer Key</Text>
           {paper.sections.map((section) => (
