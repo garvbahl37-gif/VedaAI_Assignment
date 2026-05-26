@@ -36,17 +36,23 @@ export function TopHeader({
           <ArrowLeft size={16} strokeWidth={1.8} />
         </button>
 
-        <div className="flex items-center gap-2 min-w-0 flex-1 text-ink-muted">
+        <div className="flex items-center justify-center lg:justify-start gap-2 min-w-0 flex-1 text-ink-muted">
           {variant === 'create' ? (
-            <Sparkles size={16} strokeWidth={1.7} />
+            <Sparkles size={16} strokeWidth={1.7} className="hidden lg:inline-block" />
           ) : (
-            <LayoutGrid size={16} strokeWidth={1.7} />
+            <LayoutGrid size={16} strokeWidth={1.7} className="hidden lg:inline-block" />
           )}
-          <span className="text-[14px] truncate">{title}</span>
+          <span className="text-[14px] font-medium lg:font-normal text-ink lg:text-ink-muted truncate">
+            {title}
+          </span>
         </div>
 
-        {/* Bell + popover */}
-        <div className="relative">
+        {/* Spacer that mirrors the back button width on mobile, so the centered
+            title visually aligns with the viewport center, not the back arrow. */}
+        <div className="lg:hidden h-10 w-10 shrink-0" aria-hidden="true" />
+
+        {/* Bell + popover (desktop only — MobileHeader has its own) */}
+        <div className="relative hidden lg:block">
           <button
             type="button"
             onClick={() => setNotifOpen((v) => !v)}
@@ -63,7 +69,8 @@ export function TopHeader({
           <NotificationsPopover open={notifOpen} onClose={() => setNotifOpen(false)} />
         </div>
 
-        <div className="flex items-center gap-2 h-10 pl-1 pr-2 rounded-full hover:bg-surface-subtle cursor-pointer">
+        {/* Teacher pill (desktop only) */}
+        <div className="hidden lg:flex items-center gap-2 h-10 pl-1 pr-2 rounded-full hover:bg-surface-subtle cursor-pointer">
           <div className="h-8 w-8 rounded-full bg-amber-100 overflow-hidden ring-1 ring-white">
             <svg viewBox="0 0 40 40" width="32" height="32" aria-hidden="true">
               <rect width="40" height="40" fill="#F3DDC1" />

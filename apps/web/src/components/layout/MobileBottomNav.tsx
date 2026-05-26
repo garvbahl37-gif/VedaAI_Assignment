@@ -2,12 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, ClipboardList, BookOpen, Wrench, Plus } from 'lucide-react';
+import { Home, Presentation, BookOpen, Wrench, Plus } from 'lucide-react';
 import { cn } from '@/lib/cn';
 
 const TABS = [
   { label: 'Home', href: '/home', icon: Home },
-  { label: 'Assignments', href: '/assignments', icon: ClipboardList },
+  { label: 'My Groups', href: '/groups', icon: Presentation },
   { label: 'Library', href: '/library', icon: BookOpen },
   { label: 'AI Toolkit', href: '/toolkit', icon: Wrench },
 ];
