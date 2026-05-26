@@ -11,27 +11,41 @@ import { Avatar } from '@/components/ui/Avatar';
 interface TopHeaderProps {
   title?: string;
   variant?: 'default' | 'create';
+  /**
+   * @deprecated Kept for compatibility — the back button is now always
+   * functional: tries `router.back()` first, falls back to `/home` when
+   * there's no in-app history (e.g. on a direct page load).
+   */
   showBack?: boolean;
 }
 
 export function TopHeader({
   title = 'Assignment',
   variant = 'default',
-  showBack = false,
 }: TopHeaderProps) {
   const router = useRouter();
   const teacherName = useProfileStore((s) => s.teacherName) || 'John Doe';
   const photoUrl = useProfileStore((s) => s.photoUrl) || '';
   const [editOpen, setEditOpen] = useState(false);
 
+  const handleBack = () => {
+    // If there's in-app history, go back; otherwise land on /home so the
+    // button never feels like a no-op on a direct page load.
+    if (typeof window !== 'undefined' && window.history.length > 1) {
+      router.back();
+    } else {
+      router.push('/home');
+    }
+  };
+
   return (
     <div className="sticky top-0 z-20 px-4 lg:px-6 pt-4 lg:pt-5 pb-3 bg-surface-page lg:rounded-t-2xl">
       <div className="flex items-center gap-3 bg-white rounded-full border border-line h-14 px-3 lg:px-4 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
         <button
           type="button"
-          onClick={() => (showBack ? router.back() : undefined)}
+          onClick={handleBack}
           className="h-10 w-10 rounded-full bg-white border border-line flex items-center justify-center text-ink-muted shrink-0 hover:bg-surface-subtle active:bg-line transition-colors"
-          aria-label="Back"
+          aria-label="Go back"
         >
           <ArrowLeft size={16} strokeWidth={1.8} />
         </button>
