@@ -28,9 +28,15 @@ export function NotificationsButton({ variant = 'desktop' }: NotificationsButton
   useEffect(() => {
     if (!open) return;
     const onClick = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
+      const target = e.target as Element | null;
+      if (!target) return;
+      // Clicks on the bell button (containerRef) and inside the portaled
+      // popover panel both count as "inside". Backdrop clicks have their own
+      // onClose handler on the backdrop element, so they don't need to be
+      // listed here.
+      if (containerRef.current?.contains(target)) return;
+      if (target.closest('[data-notif-popover="panel"]')) return;
+      setOpen(false);
     };
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setOpen(false);

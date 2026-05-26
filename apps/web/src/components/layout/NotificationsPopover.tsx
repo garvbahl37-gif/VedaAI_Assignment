@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import {
   Bell,
@@ -49,24 +51,34 @@ export function NotificationsPopover({ open, onClose }: NotificationsPopoverProp
   const markRead = useNotificationsStore((s) => s.markRead);
   const clear = useNotificationsStore((s) => s.clear);
 
-  if (!open) return null;
+  // Portal target — set once on mount so SSR doesn't try to reach document.body.
+  const [portalRoot, setPortalRoot] = useState<HTMLElement | null>(null);
+  useEffect(() => {
+    setPortalRoot(typeof document !== 'undefined' ? document.body : null);
+  }, []);
 
-  return (
+  if (!open || !portalRoot) return null;
+
+  const overlay = (
     <>
-      {/* Mobile-only backdrop — dims the page behind the popover so it reads as
-          modal-ish on small screens. Desktop keeps the open-air popover feel. */}
+      {/* Backdrop — mobile only. Sits above all page content. */}
       <div
-        className="fixed inset-0 z-40 bg-black/30 sm:hidden"
+        data-notif-popover="backdrop"
+        className="fixed inset-0 z-[60] bg-black/30 sm:hidden"
         onClick={onClose}
         aria-hidden="true"
       />
 
+      {/* Popover — fixed on mobile (centered under the header), absolute and
+          bell-anchored on desktop. data-notif-popover lets the parent button's
+          click-outside check treat clicks here as "inside". */}
       <div
+        data-notif-popover="panel"
         className="
-          fixed left-4 right-4 top-[4.5rem]
-          sm:absolute sm:left-auto sm:right-0 sm:top-12
+          fixed left-4 right-4 top-[4.75rem]
+          sm:left-auto sm:right-6 sm:top-[5rem]
           sm:w-[360px] sm:max-w-[90vw]
-          z-50 bg-white border border-line rounded-2xl shadow-2xl overflow-hidden
+          z-[70] bg-white border border-line rounded-2xl shadow-2xl overflow-hidden
         "
       >
         <div className="flex items-center justify-between px-4 py-3 border-b border-line">
@@ -124,6 +136,8 @@ export function NotificationsPopover({ open, onClose }: NotificationsPopoverProp
       </div>
     </>
   );
+
+  return createPortal(overlay, portalRoot);
 }
 
 function NotificationRow({
