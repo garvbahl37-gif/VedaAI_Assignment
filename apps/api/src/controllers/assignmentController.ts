@@ -28,6 +28,8 @@ export const createAssignmentSchema = z.object({
     .min(1, 'At least one question type is required'),
   additionalInstructions: z.string().optional(),
   fileName: z.string().optional(),
+  schoolName: z.string().max(200).optional(),
+  city: z.string().max(120).optional(),
 });
 
 function toAssignmentDTO(doc: IAssignment): AssignmentDTO {
@@ -43,6 +45,8 @@ function toAssignmentDTO(doc: IAssignment): AssignmentDTO {
     additionalInstructions: doc.additionalInstructions,
     fileUrl: doc.fileUrl,
     fileName: doc.fileName,
+    schoolName: doc.schoolName,
+    city: doc.city,
     status: doc.status,
     generatedPaperId: doc.generatedPaperId?.toString(),
     jobId: doc.jobId,
@@ -88,6 +92,8 @@ export async function createAssignment(req: Request, res: Response, next: NextFu
       questionTypes: body.questionTypes,
       additionalInstructions: body.additionalInstructions,
       fileName: body.fileName,
+      schoolName: body.schoolName,
+      city: body.city,
       status: 'generating',
     });
 

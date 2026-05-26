@@ -2,6 +2,7 @@
 
 import { Bell, ChevronDown, ArrowLeft, LayoutGrid, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useProfileStore } from '@/stores/profileStore';
 
 interface TopHeaderProps {
   title?: string;
@@ -15,6 +16,7 @@ export function TopHeader({
   showBack = false,
 }: TopHeaderProps) {
   const router = useRouter();
+  const teacherName = useProfileStore((s) => s.teacherName) || 'John Doe';
 
   return (
     <div className="sticky top-0 z-20 px-4 lg:px-6 pt-4 lg:pt-5 pb-3 bg-surface-page lg:rounded-t-2xl">
@@ -59,7 +61,7 @@ export function TopHeader({
             </svg>
           </div>
           <span className="text-[13px] font-medium text-ink whitespace-nowrap">
-            John Doe
+            {teacherName}
           </span>
           <ChevronDown size={14} className="text-ink-muted shrink-0" />
         </div>

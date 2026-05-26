@@ -32,6 +32,15 @@ export interface QuestionTypeRow {
   marks: number;
 }
 
+export interface SchoolProfile {
+  schoolName: string;
+  city: string;
+  principalName?: string;
+  teacherName?: string;
+  defaultClass?: string;
+  defaultSubject?: string;
+}
+
 export interface Assignment {
   _id: string;
   title: string;
@@ -40,6 +49,8 @@ export interface Assignment {
   additionalInstructions?: string;
   fileUrl?: string;
   fileName?: string;
+  schoolName?: string;
+  city?: string;
   status: AssignmentStatus;
   generatedPaperId?: string;
   jobId?: string;
@@ -96,6 +107,8 @@ export interface CreateAssignmentRequest {
   questionTypes: QuestionTypeRow[];
   additionalInstructions?: string;
   fileName?: string;
+  schoolName?: string;
+  city?: string;
 }
 
 export interface CreateAssignmentResponse {
@@ -123,6 +136,30 @@ export interface JobStatusResponse {
   status: 'queued' | 'active' | 'completed' | 'failed' | 'delayed' | 'waiting' | 'unknown';
   progress: number;
   stage?: GenerationStage;
+}
+
+// ──────────────────────────────────────────────────────────
+// Toolkit: Quick Quiz generator (no Mongo persistence).
+// ──────────────────────────────────────────────────────────
+
+export interface QuickQuizRequest {
+  topic: string;
+  className: string;
+  numberOfQuestions: number;
+  difficulty?: Difficulty | 'mixed';
+}
+
+export interface QuickQuizQuestion {
+  text: string;
+  options: string[];
+  correctIndex: number;
+  explanation?: string;
+}
+
+export interface QuickQuizResponse {
+  topic: string;
+  className: string;
+  questions: QuickQuizQuestion[];
 }
 
 export interface ApiError {

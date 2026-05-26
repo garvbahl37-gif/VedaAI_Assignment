@@ -20,6 +20,13 @@ export function buildPrompt(assignment: IAssignment): string {
     year: 'numeric',
   });
 
+  const schoolLine = [assignment.schoolName, assignment.city]
+    .filter((v) => v && v.trim().length > 0)
+    .join(', ');
+  const schoolDirective = schoolLine
+    ? `Use this exact schoolName in the output: "${schoolLine}".`
+    : `Infer schoolName ("Delhi Public School, Sector-6, Bokaro" is the default).`;
+
   return `You are an expert exam paper generator for Indian schools (CBSE/ICSE standard).
 
 Generate a complete, structured question paper with the following specifications.
@@ -43,7 +50,7 @@ REQUIREMENTS
 4. For Multiple Choice Questions, include a 4-option string array under "options".
 5. Difficulty distribution per section: ~40% easy, ~40% moderate, ~20% hard.
 6. Questions must be factual, curriculum-appropriate, and unambiguous.
-7. Infer schoolName ("Delhi Public School, Sector-6, Bokaro" is the default), subject, and className from the assignment title.
+7. ${schoolDirective} Infer subject and className from the assignment title.
 8. timeAllowed must be a human string (e.g. "45 minutes", "2 hours").
 9. maximumMarks must equal the sum of all question marks.
 10. Provide 3–5 short generalInstructions strings.

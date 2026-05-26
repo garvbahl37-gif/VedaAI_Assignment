@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -10,10 +11,13 @@ import {
   PieChart,
   Settings,
   Sparkles,
+  Pencil,
 } from 'lucide-react';
 import { Logo } from '@/components/brand/Logo';
 import { cn } from '@/lib/cn';
 import { useAssignmentStore } from '@/stores/assignmentStore';
+import { useProfileStore } from '@/stores/profileStore';
+import { ProfileEditDialog } from '@/components/layout/ProfileEditDialog';
 
 interface NavItem {
   label: string;
@@ -25,6 +29,9 @@ interface NavItem {
 export function Sidebar() {
   const pathname = usePathname();
   const assignmentsCount = useAssignmentStore((s) => s.assignments.length);
+  const schoolName = useProfileStore((s) => s.schoolName);
+  const city = useProfileStore((s) => s.city);
+  const [editOpen, setEditOpen] = useState(false);
 
   const TOP_NAV: NavItem[] = [
     { label: 'Home', href: '/home', icon: LayoutGrid },
@@ -40,90 +47,104 @@ export function Sidebar() {
   ];
 
   return (
-    <aside className="hidden lg:flex shrink-0 sticky top-0 h-screen p-4">
-      <div className="w-[268px] h-full flex flex-col bg-white border border-line rounded-3xl shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
-        {/* Brand */}
-        <div className="px-6 pt-6 pb-2">
-          <Logo />
-        </div>
-
-        {/* Create CTA — black pill with orange ring + sparkle icon */}
-        <div className="px-5 pt-6 pb-6">
-          <Link
-            href="/assignments/create"
-            className="flex items-center justify-center w-full h-11 rounded-full bg-ink hover:bg-black transition gap-2 border-[1.5px] border-brand shadow-[0_0_0_3.5px_rgba(244,128,30,0.10)]"
-          >
-            <Sparkles size={15} strokeWidth={2.3} className="text-white" />
-            <span className="text-[13.5px] font-medium text-white">
-              Create Assignment
-            </span>
-          </Link>
-        </div>
-
-        {/* Top nav */}
-        <nav className="flex-1 px-3 space-y-1 overflow-y-auto">
-          {TOP_NAV.map((item) => {
-            const active =
-              pathname === item.href ||
-              (item.href !== '/' && pathname.startsWith(item.href));
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  'flex items-center gap-3 px-3 h-10 rounded-lg text-[13.5px] transition-colors',
-                  active
-                    ? 'bg-surface-subtle text-ink font-medium'
-                    : 'text-ink-muted hover:bg-surface-subtle/60 hover:text-ink',
-                )}
-              >
-                <Icon
-                  size={17}
-                  strokeWidth={active ? 2.1 : 1.6}
-                  className="shrink-0"
-                />
-                <span className="flex-1 truncate">{item.label}</span>
-                {item.badge ? (
-                  <span className="inline-flex items-center justify-center min-w-[24px] h-[20px] rounded-full bg-brand text-white text-[11px] font-semibold px-1.5">
-                    {item.badge}
-                  </span>
-                ) : null}
-              </Link>
-            );
-          })}
-        </nav>
-
-        {/* Settings */}
-        <div className="px-3 pt-3 pb-2">
-          <Link
-            href="/settings"
-            className={cn(
-              'flex items-center gap-3 px-3 h-10 rounded-lg text-[13.5px] transition-colors',
-              pathname.startsWith('/settings')
-                ? 'bg-surface-subtle text-ink font-medium'
-                : 'text-ink-muted hover:bg-surface-subtle/60',
-            )}
-          >
-            <Settings size={17} strokeWidth={1.6} />
-            <span>Settings</span>
-          </Link>
-        </div>
-
-        {/* Profile — soft gray rounded block, no border */}
-        <div className="mx-3 mb-4 rounded-xl bg-surface-subtle p-2.5 flex items-center gap-3">
-          <ProfileAvatar />
-          <div className="min-w-0 flex-1">
-            <div className="text-[13px] font-semibold text-ink truncate">
-              Delhi Public School
-            </div>
-            <div className="text-[11.5px] text-ink-muted truncate">
-              Bokaro Steel City
-            </div>
+    <>
+      <aside className="hidden lg:flex shrink-0 sticky top-0 h-screen p-4">
+        <div className="w-[268px] h-full flex flex-col bg-white border border-line rounded-3xl shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
+          {/* Brand */}
+          <div className="px-6 pt-6 pb-2">
+            <Logo />
           </div>
+
+          {/* Create CTA — black pill with orange ring + sparkle icon */}
+          <div className="px-5 pt-6 pb-6">
+            <Link
+              href="/assignments/create"
+              className="flex items-center justify-center w-full h-11 rounded-full bg-ink hover:bg-black transition gap-2 border-[1.5px] border-brand shadow-[0_0_0_3.5px_rgba(244,128,30,0.10)]"
+            >
+              <Sparkles size={15} strokeWidth={2.3} className="text-white" />
+              <span className="text-[13.5px] font-medium text-white">
+                Create Assignment
+              </span>
+            </Link>
+          </div>
+
+          {/* Top nav */}
+          <nav className="flex-1 px-3 space-y-1 overflow-y-auto">
+            {TOP_NAV.map((item) => {
+              const active =
+                pathname === item.href ||
+                (item.href !== '/' && pathname.startsWith(item.href));
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    'flex items-center gap-3 px-3 h-10 rounded-lg text-[13.5px] transition-colors',
+                    active
+                      ? 'bg-surface-subtle text-ink font-medium'
+                      : 'text-ink-muted hover:bg-surface-subtle/60 hover:text-ink',
+                  )}
+                >
+                  <Icon
+                    size={17}
+                    strokeWidth={active ? 2.1 : 1.6}
+                    className="shrink-0"
+                  />
+                  <span className="flex-1 truncate">{item.label}</span>
+                  {item.badge ? (
+                    <span className="inline-flex items-center justify-center min-w-[24px] h-[20px] rounded-full bg-brand text-white text-[11px] font-semibold px-1.5">
+                      {item.badge}
+                    </span>
+                  ) : null}
+                </Link>
+              );
+            })}
+          </nav>
+
+          {/* Settings */}
+          <div className="px-3 pt-3 pb-2">
+            <Link
+              href="/settings"
+              className={cn(
+                'flex items-center gap-3 px-3 h-10 rounded-lg text-[13.5px] transition-colors',
+                pathname.startsWith('/settings')
+                  ? 'bg-surface-subtle text-ink font-medium'
+                  : 'text-ink-muted hover:bg-surface-subtle/60',
+              )}
+            >
+              <Settings size={17} strokeWidth={1.6} />
+              <span>Settings</span>
+            </Link>
+          </div>
+
+          {/* Profile — clickable card opens edit dialog */}
+          <button
+            type="button"
+            onClick={() => setEditOpen(true)}
+            className="group mx-3 mb-4 rounded-xl bg-surface-subtle p-2.5 flex items-center gap-3 hover:bg-line/60 transition-colors text-left"
+            aria-label="Edit school profile"
+          >
+            <ProfileAvatar />
+            <div className="min-w-0 flex-1">
+              <div className="text-[13px] font-semibold text-ink truncate">
+                {schoolName || 'My School'}
+              </div>
+              <div className="text-[11.5px] text-ink-muted truncate">
+                {city || 'Tap to set city'}
+              </div>
+            </div>
+            <Pencil
+              size={13}
+              className="text-ink-muted opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+              strokeWidth={1.7}
+            />
+          </button>
         </div>
-      </div>
-    </aside>
+      </aside>
+
+      <ProfileEditDialog open={editOpen} onClose={() => setEditOpen(false)} />
+    </>
   );
 }
 

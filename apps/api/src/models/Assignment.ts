@@ -15,6 +15,8 @@ export interface IAssignment extends Document {
   additionalInstructions?: string;
   fileUrl?: string;
   fileName?: string;
+  schoolName?: string;
+  city?: string;
   status: AssignmentStatus;
   generatedPaperId?: Types.ObjectId;
   jobId?: string;
@@ -39,6 +41,8 @@ const AssignmentSchema = new Schema<IAssignment>(
     additionalInstructions: { type: String, default: '' },
     fileUrl: { type: String },
     fileName: { type: String },
+    schoolName: { type: String },
+    city: { type: String },
     status: {
       type: String,
       enum: ['draft', 'generating', 'completed', 'failed'],

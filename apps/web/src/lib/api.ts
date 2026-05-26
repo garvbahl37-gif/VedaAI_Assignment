@@ -6,6 +6,8 @@ import type {
   GetPaperResponse,
   JobStatusResponse,
   ListAssignmentsResponse,
+  QuickQuizRequest,
+  QuickQuizResponse,
 } from '@vedaai/shared';
 
 const BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
@@ -45,6 +47,11 @@ export const api = {
   regenerate: (id: string) =>
     http<CreateAssignmentResponse>(`/assignments/${id}/regenerate`, { method: 'POST' }),
   getJobStatus: (jobId: string) => http<JobStatusResponse>(`/jobs/${jobId}/status`),
+  quickQuiz: (body: QuickQuizRequest) =>
+    http<QuickQuizResponse>('/toolkit/quick-quiz', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
 };
 
 export type { Assignment, GeneratedPaper };

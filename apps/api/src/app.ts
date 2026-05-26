@@ -3,6 +3,7 @@ import cors from 'cors';
 import { env } from './config/env';
 import assignmentsRouter from './routes/assignments';
 import generationRouter from './routes/generation';
+import toolkitRouter from './routes/toolkit';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 
 export function createApp(): Express {
@@ -24,6 +25,7 @@ export function createApp(): Express {
 
   app.use('/api/assignments', assignmentsRouter);
   app.use('/api/jobs', generationRouter);
+  app.use('/api/toolkit', toolkitRouter);
 
   app.use(notFoundHandler);
   app.use(errorHandler);

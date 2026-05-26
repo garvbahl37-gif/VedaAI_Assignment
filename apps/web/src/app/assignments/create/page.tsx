@@ -10,6 +10,7 @@ import { QuestionTypeTable } from '@/components/create/QuestionTypeTable';
 import { AdditionalInfoTextarea } from '@/components/create/AdditionalInfoTextarea';
 import { useCreateAssignmentStore } from '@/stores/createAssignmentStore';
 import { useGenerationStore } from '@/stores/generationStore';
+import { useProfileStore } from '@/stores/profileStore';
 import { api } from '@/lib/api';
 
 export default function CreateAssignmentPage() {
@@ -30,6 +31,9 @@ export default function CreateAssignmentPage() {
   const setAssignmentId = useGenerationStore((s) => s.setAssignmentId);
   const setStatus = useGenerationStore((s) => s.setStatus);
   const resetGen = useGenerationStore((s) => s.reset);
+
+  const schoolName = useProfileStore((s) => s.schoolName);
+  const city = useProfileStore((s) => s.city);
 
   function validate(): string[] {
     const errs: string[] = [];
@@ -61,6 +65,8 @@ export default function CreateAssignmentPage() {
         questionTypes: formData.questionTypes,
         additionalInstructions: formData.additionalInstructions.trim() || undefined,
         fileName: formData.fileName || undefined,
+        schoolName: schoolName?.trim() || undefined,
+        city: city?.trim() || undefined,
       });
 
       setJobId(res.jobId);
