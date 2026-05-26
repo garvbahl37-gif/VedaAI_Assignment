@@ -1,7 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
   "installCommand": "cd ../.. && npm install --include=dev",
   "buildCommand": "cd ../.. && npm run build -w @vedaai/shared",
+  "outputDirectory": ".",
   "functions": {
     "api/index.ts": {
       "maxDuration": 60
