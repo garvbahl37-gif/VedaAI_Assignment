@@ -1,0 +1,30 @@
+{
+  "name": "vedaai",
+  "version": "1.0.0",
+  "private": true,
+  "description": "VedaAI — AI Assessment Creator (monorepo)",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -n api,web -c blue,green \"npm run dev -w @vedaai/api\" \"npm run dev -w @vedaai/web\"",
+    "dev:api": "npm run dev -w @vedaai/api",
+    "dev:web": "npm run dev -w @vedaai/web",
+    "build": "npm run build -w @vedaai/shared && npm run build -w @vedaai/api && npm run build -w @vedaai/web",
+    "build:shared": "npm run build -w @vedaai/shared",
+    "build:api": "npm run build -w @vedaai/api",
+    "build:web": "npm run build -w @vedaai/web",
+    "lint": "npm run lint -w @vedaai/web && npm run lint -w @vedaai/api",
+    "docker:up": "docker-compose up -d mongodb redis",
+    "docker:down": "docker-compose down",
+    "docker:full": "docker-compose up --build"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "typescript": "^5.4.5"
+  },
+  "engines": {
+    "node": ">=18.18.0"
+  }
+}

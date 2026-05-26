@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body {
+    @apply bg-surface-page text-ink antialiased;
+    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    font-feature-settings: 'cv11', 'ss01';
+  }
+  * {
+    @apply border-line;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium transition disabled:opacity-50 disabled:pointer-events-none;
+  }
+  .btn-primary {
+    @apply btn bg-ink text-white hover:bg-black h-10 px-4;
+  }
+  .btn-secondary {
+    @apply btn bg-white border border-line text-ink hover:bg-surface-subtle h-10 px-4;
+  }
+  .btn-pill {
+    @apply btn bg-ink text-white hover:bg-black h-11 px-5 rounded-full;
+  }
+  .input {
+    @apply h-10 w-full rounded-md border border-line bg-white px-3 text-sm text-ink placeholder:text-ink-subtle focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand;
+  }
+  .card {
+    @apply rounded-card border border-line bg-white shadow-card;
+  }
+  .nav-item {
+    @apply flex items-center gap-3 px-3 h-9 rounded-md text-[13px] font-normal text-ink-muted hover:bg-surface-subtle transition-colors;
+  }
+  .nav-item-active {
+    @apply bg-surface-subtle text-ink font-medium relative;
+  }
+  .nav-item-active::before {
+    content: '';
+    @apply absolute left-0 top-1/2 -translate-y-1/2 h-5 w-[2px] bg-brand rounded-r;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+}
+
+/* Loading shimmer */
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+.shimmer {
+  background: linear-gradient(90deg, #f0f0f0 0px, #e0e0e0 40px, #f0f0f0 80px);
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite linear;
+}
