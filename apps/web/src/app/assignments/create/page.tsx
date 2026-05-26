@@ -8,6 +8,7 @@ import { FileUploadZone } from '@/components/create/FileUploadZone';
 import { DueDateInput } from '@/components/create/DueDateInput';
 import { QuestionTypeTable } from '@/components/create/QuestionTypeTable';
 import { AdditionalInfoTextarea } from '@/components/create/AdditionalInfoTextarea';
+import { GenerationLoadingOverlay } from '@/components/create/GenerationLoadingOverlay';
 import { useCreateAssignmentStore } from '@/stores/createAssignmentStore';
 import { useGenerationStore } from '@/stores/generationStore';
 import { useProfileStore } from '@/stores/profileStore';
@@ -229,7 +230,7 @@ export default function CreateAssignmentPage() {
           <button
             type="button"
             onClick={handleSubmit}
-            className="inline-flex items-center gap-2 h-11 px-6 rounded-full bg-ink text-[13.5px] font-medium text-white hover:bg-black disabled:opacity-60"
+            className="inline-flex items-center gap-2 h-11 px-6 rounded-full bg-ink text-[13.5px] font-medium text-white hover:bg-black disabled:opacity-80"
             disabled={submitting}
           >
             {submitting ? 'Generating…' : 'Next'}
@@ -237,6 +238,8 @@ export default function CreateAssignmentPage() {
           </button>
         </div>
       </div>
+
+      <GenerationLoadingOverlay open={submitting} />
     </>
   );
 }
