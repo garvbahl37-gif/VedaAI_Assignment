@@ -11,6 +11,7 @@ import { AdditionalInfoTextarea } from '@/components/create/AdditionalInfoTextar
 import { useCreateAssignmentStore } from '@/stores/createAssignmentStore';
 import { useGenerationStore } from '@/stores/generationStore';
 import { useProfileStore } from '@/stores/profileStore';
+import { useNotificationsStore } from '@/stores/notificationsStore';
 import { api } from '@/lib/api';
 
 export default function CreateAssignmentPage() {
@@ -34,6 +35,7 @@ export default function CreateAssignmentPage() {
 
   const schoolName = useProfileStore((s) => s.schoolName);
   const city = useProfileStore((s) => s.city);
+  const addNotification = useNotificationsStore((s) => s.add);
 
   function validate(): string[] {
     const errs: string[] = [];
@@ -72,6 +74,20 @@ export default function CreateAssignmentPage() {
       setJobId(res.jobId);
       setAssignmentId(res.assignment._id);
       setStatus('queued');
+      addNotification({
+        type: 'assignment_created',
+        title: 'Assignment created',
+        description: res.assignment.title,
+        link: `/assignments/${res.assignment._id}/output?jobId=${res.jobId}`,
+      });
+      if (res.paperId) {
+        addNotification({
+          type: 'paper_generated',
+          title: 'Question paper ready',
+          description: res.assignment.title,
+          link: `/assignments/${res.assignment._id}/output?jobId=${res.jobId}`,
+        });
+      }
       reset();
       router.push(`/assignments/${res.assignment._id}/output?jobId=${res.jobId}`);
     } catch (err) {

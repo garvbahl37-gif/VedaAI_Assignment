@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { X, Check } from 'lucide-react';
 import { useProfileStore } from '@/stores/profileStore';
+import { useNotificationsStore } from '@/stores/notificationsStore';
 import type { SchoolProfile } from '@vedaai/shared';
 
 interface ProfileEditDialogProps {
@@ -13,6 +14,7 @@ interface ProfileEditDialogProps {
 export function ProfileEditDialog({ open, onClose }: ProfileEditDialogProps) {
   const profile = useProfileStore();
   const setProfile = useProfileStore((s) => s.setProfile);
+  const addNotification = useNotificationsStore((s) => s.add);
 
   const [draft, setDraft] = useState<SchoolProfile>({
     schoolName: profile.schoolName,
@@ -50,13 +52,19 @@ export function ProfileEditDialog({ open, onClose }: ProfileEditDialogProps) {
   if (!open) return null;
 
   const handleSave = () => {
+    const finalName = draft.schoolName.trim() || 'My School';
     setProfile({
-      schoolName: draft.schoolName.trim() || 'My School',
+      schoolName: finalName,
       city: draft.city.trim(),
       principalName: draft.principalName?.trim() || '',
       teacherName: draft.teacherName?.trim() || '',
       defaultClass: draft.defaultClass?.trim() || '',
       defaultSubject: draft.defaultSubject?.trim() || '',
+    });
+    addNotification({
+      type: 'profile_saved',
+      title: 'School profile updated',
+      description: finalName,
     });
     setSaved(true);
     setTimeout(() => {

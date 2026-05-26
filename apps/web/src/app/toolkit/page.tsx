@@ -1,9 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { Sparkles, RotateCcw, Eye, EyeOff, Loader2, CheckCircle2, XCircle } from 'lucide-react';
+import { Sparkles, RotateCcw, Eye, EyeOff, Loader2, CheckCircle2, XCircle, BookmarkPlus, Check } from 'lucide-react';
 import { TopHeader } from '@/components/layout/TopHeader';
 import { useProfileStore } from '@/stores/profileStore';
+import { useLibraryStore } from '@/stores/libraryStore';
+import { useNotificationsStore } from '@/stores/notificationsStore';
 import { api } from '@/lib/api';
 import type { Difficulty, QuickQuizQuestion } from '@vedaai/shared';
 
@@ -19,6 +21,7 @@ const DIFFICULTIES: { value: DifficultyChoice; label: string }[] = [
 export default function ToolkitPage() {
   const defaultClass = useProfileStore((s) => s.defaultClass);
   const defaultSubject = useProfileStore((s) => s.defaultSubject);
+  const addNotification = useNotificationsStore((s) => s.add);
 
   const [topic, setTopic] = useState(defaultSubject || '');
   const [className, setClassName] = useState(defaultClass || 'Class 6');
@@ -50,6 +53,11 @@ export default function ToolkitPage() {
         difficulty,
       });
       setResult(res.questions);
+      addNotification({
+        type: 'quiz_created',
+        title: 'Quiz generated',
+        description: `${topic.trim()} · ${res.questions.length} questions`,
+      });
     } catch (err) {
       setError((err as Error).message || 'Failed to generate quiz.');
     } finally {
@@ -189,30 +197,79 @@ export default function ToolkitPage() {
 
         {/* Results */}
         {result && result.length > 0 && (
-          <QuizResults questions={result} />
+          <QuizResults
+            questions={result}
+            meta={{ topic: topic.trim(), className: className.trim(), difficulty }}
+          />
         )}
       </div>
     </>
   );
 }
 
-function QuizResults({ questions }: { questions: QuickQuizQuestion[] }) {
+function QuizResults({
+  questions,
+  meta,
+}: {
+  questions: QuickQuizQuestion[];
+  meta: { topic: string; className: string; difficulty: DifficultyChoice };
+}) {
   const [showAnswers, setShowAnswers] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const saveToLibrary = useLibraryStore((s) => s.save);
+  const addNotification = useNotificationsStore((s) => s.add);
+
+  const handleSave = () => {
+    saveToLibrary({
+      topic: meta.topic,
+      className: meta.className,
+      difficulty: meta.difficulty,
+      questions,
+    });
+    addNotification({
+      type: 'quiz_saved',
+      title: 'Saved to library',
+      description: meta.topic,
+      link: '/library',
+    });
+    setSaved(true);
+    setTimeout(() => setSaved(false), 1800);
+  };
 
   return (
     <div className="bg-white border border-line rounded-3xl shadow-[0_1px_2px_rgba(0,0,0,0.03)] p-6 lg:p-7 space-y-5">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2 flex-wrap">
         <h3 className="text-[16px] font-bold text-ink">
           Generated Quiz ({questions.length} {questions.length === 1 ? 'question' : 'questions'})
         </h3>
-        <button
-          type="button"
-          onClick={() => setShowAnswers((s) => !s)}
-          className="inline-flex items-center gap-1.5 h-9 px-4 rounded-full border border-line bg-white text-[12.5px] font-medium text-ink hover:bg-surface-subtle"
-        >
-          {showAnswers ? <EyeOff size={13} /> : <Eye size={13} />}
-          {showAnswers ? 'Hide Answers' : 'Show Answers'}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={saved}
+            className="inline-flex items-center gap-1.5 h-9 px-4 rounded-full bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 text-[12.5px] font-medium disabled:opacity-80"
+          >
+            {saved ? (
+              <>
+                <Check size={13} />
+                Saved
+              </>
+            ) : (
+              <>
+                <BookmarkPlus size={13} />
+                Save to Library
+              </>
+            )}
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowAnswers((s) => !s)}
+            className="inline-flex items-center gap-1.5 h-9 px-4 rounded-full border border-line bg-white text-[12.5px] font-medium text-ink hover:bg-surface-subtle"
+          >
+            {showAnswers ? <EyeOff size={13} /> : <Eye size={13} />}
+            {showAnswers ? 'Hide Answers' : 'Show Answers'}
+          </button>
+        </div>
       </div>
 
       <ol className="space-y-5">

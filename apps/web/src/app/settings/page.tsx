@@ -1,13 +1,9 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Check, Github, ExternalLink, RotateCcw } from 'lucide-react';
+import { Check, RotateCcw } from 'lucide-react';
 import { TopHeader } from '@/components/layout/TopHeader';
 import { useProfileStore } from '@/stores/profileStore';
-
-const APP_VERSION = '1.0.0';
-const REPO_URL = 'https://github.com/garvbahl37-gif/VedaAI_Assignment';
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
 
 export default function SettingsPage() {
   const profile = useProfileStore();
@@ -104,34 +100,6 @@ export default function SettingsPage() {
               }}
             />
           </div>
-        </SettingsCard>
-
-        {/* Section: About */}
-        <SettingsCard
-          title="About VedaAI"
-          subtitle="App and deployment details."
-        >
-          <dl className="grid grid-cols-[140px_1fr] gap-y-2 text-[13px]">
-            <dt className="text-ink-muted">Version</dt>
-            <dd className="text-ink font-medium">{APP_VERSION}</dd>
-
-            <dt className="text-ink-muted">API endpoint</dt>
-            <dd className="text-ink font-mono text-[12px] truncate">{API_URL}</dd>
-
-            <dt className="text-ink-muted">Repository</dt>
-            <dd>
-              <a
-                href={REPO_URL}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1.5 text-ink hover:underline"
-              >
-                <Github size={13} />
-                garvbahl37-gif/VedaAI_Assignment
-                <ExternalLink size={11} />
-              </a>
-            </dd>
-          </dl>
         </SettingsCard>
 
         {/* Section: Danger Zone */}

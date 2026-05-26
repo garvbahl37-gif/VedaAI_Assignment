@@ -1,8 +1,11 @@
 'use client';
 
+import { useState } from 'react';
 import { Bell, ChevronDown, ArrowLeft, LayoutGrid, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useProfileStore } from '@/stores/profileStore';
+import { useNotificationsStore, unreadCount } from '@/stores/notificationsStore';
+import { NotificationsPopover } from '@/components/layout/NotificationsPopover';
 
 interface TopHeaderProps {
   title?: string;
@@ -17,6 +20,9 @@ export function TopHeader({
 }: TopHeaderProps) {
   const router = useRouter();
   const teacherName = useProfileStore((s) => s.teacherName) || 'John Doe';
+  const items = useNotificationsStore((s) => s.items);
+  const unread = unreadCount(items);
+  const [notifOpen, setNotifOpen] = useState(false);
 
   return (
     <div className="sticky top-0 z-20 px-4 lg:px-6 pt-4 lg:pt-5 pb-3 bg-surface-page lg:rounded-t-2xl">
@@ -39,14 +45,23 @@ export function TopHeader({
           <span className="text-[14px] truncate">{title}</span>
         </div>
 
-        <button
-          type="button"
-          className="relative h-10 w-10 rounded-full hover:bg-surface-subtle flex items-center justify-center text-ink-muted"
-          aria-label="Notifications"
-        >
-          <Bell size={18} strokeWidth={1.7} />
-          <span className="absolute top-2.5 right-2.5 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white" />
-        </button>
+        {/* Bell + popover */}
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setNotifOpen((v) => !v)}
+            className="relative h-10 w-10 rounded-full hover:bg-surface-subtle flex items-center justify-center text-ink-muted"
+            aria-label={`Notifications${unread > 0 ? ` (${unread} unread)` : ''}`}
+          >
+            <Bell size={18} strokeWidth={1.7} />
+            {unread > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-white">
+                {unread > 9 ? '9+' : unread}
+              </span>
+            )}
+          </button>
+          <NotificationsPopover open={notifOpen} onClose={() => setNotifOpen(false)} />
+        </div>
 
         <div className="flex items-center gap-2 h-10 pl-1 pr-2 rounded-full hover:bg-surface-subtle cursor-pointer">
           <div className="h-8 w-8 rounded-full bg-amber-100 overflow-hidden ring-1 ring-white">
